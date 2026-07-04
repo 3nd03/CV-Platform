@@ -1,6 +1,7 @@
 import streamlit as st
 from app.chatbot import run_onboarding
 from app.skill_gap import run_skill_gap
+from app.cover_letter import run_cover_letter
 
 st.set_page_config(page_title="CV Platform", layout="centered")
 st.title("CV Platform")
@@ -8,17 +9,30 @@ st.title("CV Platform")
 if "page" not in st.session_state:
     st.session_state.page = "onboarding"
 
-if st.session_state.page == "onboarding":
+
+def _nav_button(label: str, target: str) -> None:
+    if st.button(label):
+        st.session_state.page = target
+        st.rerun()
+
+
+page = st.session_state.page
+
+if page == "onboarding":
     run_onboarding()
 
     if st.session_state.get("profile") and st.session_state.get("step", 0) >= 10:
         st.divider()
-        if st.button("Run Skill Gap Analysis"):
-            st.session_state.page = "skill_gap"
-            st.rerun()
+        col1, col2 = st.columns(2)
+        with col1:
+            _nav_button("Skill Gap Analysis", "skill_gap")
+        with col2:
+            _nav_button("Cover Letter", "cover_letter")
 
-elif st.session_state.page == "skill_gap":
-    if st.button("Back to profile"):
-        st.session_state.page = "onboarding"
-        st.rerun()
+elif page == "skill_gap":
+    _nav_button("Back to profile", "onboarding")
     run_skill_gap()
+
+elif page == "cover_letter":
+    _nav_button("Back to profile", "onboarding")
+    run_cover_letter()

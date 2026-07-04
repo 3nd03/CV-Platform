@@ -1,7 +1,3 @@
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 import streamlit as st
 from services.claude_client import call_claude
 from prompts.skill_gap_prompt import build_skill_gap_prompt

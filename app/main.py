@@ -6,6 +6,7 @@ from app.cv_analyser import run_cv_analyser
 from app.cover_letter import run_cover_letter
 from app.job_roles import run_job_roles
 from app.linkedin_message import run_linkedin_message
+from app.interview_prep import run_interview_prep
 from utils.helpers import nav_button
 
 st.set_page_config(page_title="CV Platform", layout="centered")
@@ -45,3 +46,7 @@ elif page == "job_roles":
 elif page == "linkedin_message":
     nav_button("Back to Dashboard", "dashboard")
     run_linkedin_message()
+
+elif page == "interview_prep":
+    nav_button("Back to Dashboard", "dashboard")
+    run_interview_prep()

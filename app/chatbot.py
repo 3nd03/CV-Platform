@@ -29,7 +29,22 @@ def run_onboarding() -> None:
 
     if step >= len(QUESTIONS):
         st.success("Profile complete. Your answers have been saved.")
-        st.json(st.session_state.profile)
+        labels = {
+            "target_role": "Target role",
+            "current_skills": "Current skills",
+            "background": "Background",
+            "experience": "Experience",
+            "tools": "Tools and platforms",
+            "location": "Location",
+            "salary": "Salary expectations",
+            "open_to_learning": "Open to learning",
+            "timeline": "Timeline",
+            "self_gaps": "Self-identified gaps",
+        }
+        for key, label in labels.items():
+            value = st.session_state.profile.get(key, "")
+            if value:
+                st.markdown(f"**{label}:** {value}")
         return
 
     key, question = QUESTIONS[step]

@@ -1,13 +1,24 @@
 import streamlit as st
 from chatbot import run_onboarding
+from skill_gap import run_skill_gap
 
 st.set_page_config(page_title="CV Platform", layout="centered")
 st.title("CV Platform")
 
-run_onboarding()
+if "page" not in st.session_state:
+    st.session_state.page = "onboarding"
 
-if st.session_state.get("profile") and st.session_state.step >= 10:
-    st.divider()
-    st.subheader("Your Profile")
-    for key, value in st.session_state.profile.items():
-        st.markdown(f"**{key.replace('_', ' ').title()}:** {value}")
+if st.session_state.page == "onboarding":
+    run_onboarding()
+
+    if st.session_state.get("profile") and st.session_state.get("step", 0) >= 10:
+        st.divider()
+        if st.button("Run Skill Gap Analysis"):
+            st.session_state.page = "skill_gap"
+            st.rerun()
+
+elif st.session_state.page == "skill_gap":
+    if st.button("Back to profile"):
+        st.session_state.page = "onboarding"
+        st.rerun()
+    run_skill_gap()

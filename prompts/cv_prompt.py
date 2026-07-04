@@ -13,16 +13,16 @@ CV CONTENT:
 Provide a structured review. Use these exact headings:
 
 **Overall Impression**
-One short paragraph on overall fit and first impression.
+3 to 5 bullet points on overall fit and first impression.
 
 **What Works Well**
-Bullet list of genuine strengths in the CV.
+3 to 5 bullet points on genuine strengths in the CV.
 
 **Weaknesses and Gaps**
-Bullet list of what is missing, weak, or misaligned with the target role.
+3 to 5 bullet points on what is missing, weak, or misaligned with the target role.
 
 **Specific Improvements**
-Numbered list of concrete, actionable changes the candidate should make.
+3 to 5 bullet points of concrete, actionable changes the candidate should make.
 
-Write in UK English. Be direct. Do not pad with generic advice.
+Write in UK English. Be direct, punchy and actionable. No extended paragraphs, no padding, no generic advice. Every section is bullet points only, capped at 5.
 """

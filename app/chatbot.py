@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.helpers import render_profile_summary
 
 QUESTIONS = [
     ("target_role", "What role are you targeting?"),
@@ -29,22 +30,7 @@ def run_onboarding() -> None:
 
     if step >= len(QUESTIONS):
         st.success("Profile complete. Your answers have been saved.")
-        labels = {
-            "target_role": "Target role",
-            "current_skills": "Current skills",
-            "background": "Background",
-            "experience": "Experience",
-            "tools": "Tools and platforms",
-            "location": "Location",
-            "salary": "Salary expectations",
-            "open_to_learning": "Open to learning",
-            "timeline": "Timeline",
-            "self_gaps": "Self-identified gaps",
-        }
-        for key, label in labels.items():
-            value = st.session_state.profile.get(key, "")
-            if value:
-                st.markdown(f"**{label}:** {value}")
+        render_profile_summary(st.session_state.profile)
         return
 
     key, question = QUESTIONS[step]

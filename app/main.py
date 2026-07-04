@@ -1,6 +1,6 @@
 import streamlit as st
-from chatbot import run_onboarding
-from skill_gap import run_skill_gap
+from app.chatbot import run_onboarding
+from app.skill_gap import run_skill_gap
 
 st.set_page_config(page_title="CV Platform", layout="centered")
 st.title("CV Platform")

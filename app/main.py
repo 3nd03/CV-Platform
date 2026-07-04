@@ -5,6 +5,7 @@ from app.skill_gap import run_skill_gap
 from app.cv_analyser import run_cv_analyser
 from app.cover_letter import run_cover_letter
 from app.job_roles import run_job_roles
+from app.linkedin_message import run_linkedin_message
 from utils.helpers import nav_button
 
 st.set_page_config(page_title="CV Platform", layout="centered")
@@ -40,3 +41,7 @@ elif page == "cover_letter":
 elif page == "job_roles":
     nav_button("Back to Dashboard", "dashboard")
     run_job_roles()
+
+elif page == "linkedin_message":
+    nav_button("Back to Dashboard", "dashboard")
+    run_linkedin_message()

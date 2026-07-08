@@ -1,6 +1,7 @@
 import streamlit as st
 from services.claude_client import call_claude
 from prompts.skill_gap_prompt import build_skill_gap_prompt
+from database.db_client import save_skill_gap
 
 
 def _parse_response(text: str) -> dict:
@@ -33,7 +34,12 @@ def run_skill_gap() -> None:
         with st.spinner("Analysing your profile..."):
             prompt = build_skill_gap_prompt(profile)
             response = call_claude(prompt)
-            st.session_state.skill_gap_result = _parse_response(response)
+            result = _parse_response(response)
+            st.session_state.skill_gap_result = result
+            try:
+                save_skill_gap(st.session_state.session_id, result)
+            except Exception:
+                st.warning("Could not save to database, continuing without persistence")
 
     result = st.session_state.get("skill_gap_result")
     if not result:

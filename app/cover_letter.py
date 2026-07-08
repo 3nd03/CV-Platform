@@ -1,6 +1,7 @@
 import streamlit as st
 from services.claude_client import call_claude
 from prompts.cover_letter_prompt import build_cover_letter_prompt
+from database.db_client import save_cover_letter
 
 
 def run_cover_letter() -> None:
@@ -23,7 +24,12 @@ def run_cover_letter() -> None:
         else:
             with st.spinner("Writing your cover letter..."):
                 prompt = build_cover_letter_prompt(profile, job_description.strip())
-                st.session_state.cover_letter_result = call_claude(prompt)
+                letter_text = call_claude(prompt)
+                st.session_state.cover_letter_result = letter_text
+                try:
+                    save_cover_letter(st.session_state.session_id, job_description.strip(), letter_text)
+                except Exception:
+                    st.warning("Could not save to database, continuing without persistence")
 
     result = st.session_state.get("cover_letter_result")
     if result:

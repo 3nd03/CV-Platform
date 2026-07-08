@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.helpers import render_profile_summary
+from database.db_client import save_profile
 
 QUESTIONS = [
     ("target_role", "What role are you targeting?"),
@@ -29,6 +30,12 @@ def run_onboarding() -> None:
     step = st.session_state.step
 
     if step >= len(QUESTIONS):
+        if not st.session_state.get("profile_saved"):
+            try:
+                save_profile(st.session_state.session_id, st.session_state.profile)
+                st.session_state.profile_saved = True
+            except Exception:
+                st.warning("Could not save to database, continuing without persistence")
         st.success("Profile complete. Your answers have been saved.")
         render_profile_summary(st.session_state.profile)
         return

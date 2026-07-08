@@ -1,6 +1,7 @@
 import streamlit as st
 from services.claude_client import call_claude
 from prompts.linkedin_prompt import build_linkedin_prompt
+from database.db_client import save_linkedin_message
 
 
 def run_linkedin_message() -> None:
@@ -20,7 +21,12 @@ def run_linkedin_message() -> None:
     if st.button("Generate message"):
         with st.spinner("Writing your message..."):
             prompt = build_linkedin_prompt(profile, context.strip())
-            st.session_state.linkedin_result = call_claude(prompt)
+            message_text = call_claude(prompt)
+            st.session_state.linkedin_result = message_text
+            try:
+                save_linkedin_message(st.session_state.session_id, context.strip(), message_text)
+            except Exception:
+                st.warning("Could not save to database, continuing without persistence")
 
     result = st.session_state.get("linkedin_result")
     if result:

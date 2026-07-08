@@ -2,6 +2,8 @@ import streamlit as st
 from PyPDF2 import PdfReader
 from services.claude_client import call_claude
 from prompts.cv_prompt import build_cv_prompt
+from services.s3_client import upload_cv
+from database.db_client import save_cv_upload, save_cv_analysis
 
 
 def _extract_text(pdf_file) -> str:
@@ -26,7 +28,15 @@ def run_cv_analyser() -> None:
             with st.spinner("Analysing your CV..."):
                 cv_text = _extract_text(uploaded_file).strip()
                 prompt = build_cv_prompt(profile, cv_text)
-                st.session_state.cv_result = call_claude(prompt)
+                result = call_claude(prompt)
+                st.session_state.cv_result = result
+                try:
+                    session_id = st.session_state.session_id
+                    s3_key = upload_cv(uploaded_file.getvalue(), session_id, uploaded_file.name)
+                    save_cv_upload(session_id, s3_key)
+                    save_cv_analysis(session_id, result)
+                except Exception:
+                    st.warning("Could not save to database, continuing without persistence")
 
     result = st.session_state.get("cv_result")
     if result:

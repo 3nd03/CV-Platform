@@ -1,6 +1,7 @@
 import streamlit as st
 from services.claude_client import call_claude
 from prompts.job_roles_prompt import build_job_roles_prompt
+from database.db_client import save_job_roles
 
 
 def _parse_response(text: str) -> dict:
@@ -34,7 +35,12 @@ def run_job_roles() -> None:
             missing_skills = st.session_state.get("skill_gap_result", {}).get("MISSING_SKILLS", "")
             prompt = build_job_roles_prompt(profile, missing_skills)
             response = call_claude(prompt)
-            st.session_state.job_roles_result = _parse_response(response)
+            result = _parse_response(response)
+            st.session_state.job_roles_result = result
+            try:
+                save_job_roles(st.session_state.session_id, result)
+            except Exception:
+                st.warning("Could not save to database, continuing without persistence")
 
     result = st.session_state.get("job_roles_result")
     if not result:

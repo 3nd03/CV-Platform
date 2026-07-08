@@ -1,4 +1,5 @@
 import streamlit as st
+import uuid
 from app.chatbot import run_onboarding
 from app.dashboard import run_dashboard
 from app.skill_gap import run_skill_gap
@@ -9,8 +10,12 @@ from app.linkedin_message import run_linkedin_message
 from app.interview_prep import run_interview_prep
 from utils.helpers import nav_button
 
+
 st.set_page_config(page_title="CV Platform", layout="centered")
 st.title("CV Platform")
+
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
 
 if "page" not in st.session_state:
     st.session_state.page = "onboarding"

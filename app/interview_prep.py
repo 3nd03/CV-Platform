@@ -2,6 +2,7 @@ import streamlit as st
 from services.claude_client import call_claude
 from prompts.interview_prep_prompt import build_interview_prep_prompt
 from database.db_client import save_interview_prep
+from utils.helpers import render_followup_chat
 
 
 def run_interview_prep() -> None:
@@ -31,3 +32,5 @@ def run_interview_prep() -> None:
         st.divider()
         st.subheader("Your Questions")
         st.markdown(result)
+
+        render_followup_chat("interview_prep", result, profile)

@@ -1,6 +1,6 @@
 import streamlit as st
 import uuid
-from app.chatbot import run_onboarding
+from app.chatbot import run_onboarding, QUESTIONS
 from app.dashboard import run_dashboard
 from app.skill_gap import run_skill_gap
 from app.cv_analyser import run_cv_analyser
@@ -11,8 +11,67 @@ from app.interview_prep import run_interview_prep
 from utils.helpers import nav_button
 
 
-st.set_page_config(page_title="CV Platform", layout="centered")
-st.title("CV Platform")
+st.set_page_config(page_title="Careerly", layout="centered")
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;500;600&display=swap');
+
+.careerly-header {
+    padding: 2rem 0 1.5rem 0;
+    border-bottom: 1px solid #e5e5e0;
+    margin-bottom: 2rem;
+}
+.careerly-header-compact {
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e5e0;
+    margin-bottom: 1.5rem;
+}
+.careerly-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1a2b4a;
+    margin: 0;
+}
+.careerly-logo span {
+    color: #c8963e;
+    font-style: italic;
+}
+.careerly-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #6b7c6b;
+    text-transform: uppercase;
+    margin: 1.2rem 0 0.5rem 0;
+}
+.careerly-eyebrow::before {
+    content: "●";
+    color: #c8963e;
+    margin-right: 0.5rem;
+}
+.careerly-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #1a2b4a;
+    line-height: 1.15;
+    margin: 0 0 0.8rem 0;
+}
+.careerly-headline em {
+    color: #c8963e;
+    font-style: italic;
+}
+.careerly-subtext {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #5a6570;
+    max-width: 480px;
+    line-height: 1.5;
+}
+</style>
+""", unsafe_allow_html=True)
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -23,9 +82,25 @@ if "page" not in st.session_state:
 page = st.session_state.page
 
 if page == "onboarding":
+    st.markdown("""
+    <div class="careerly-header">
+        <p class="careerly-logo">Career<span>ly</span></p>
+        <p class="careerly-eyebrow">Job search, without the guesswork</p>
+        <p class="careerly-headline">Turn your CV into <em>your next role</em>.</p>
+        <p class="careerly-subtext">Careerly reads your CV and the job you want, then tells you exactly what's missing and how to close the gap.</p>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+    <div class="careerly-header-compact">
+        <p class="careerly-logo">Career<span>ly</span></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+if page == "onboarding":
     run_onboarding()
 
-    if st.session_state.get("profile") and st.session_state.get("step", 0) >= 10:
+    if st.session_state.get("profile") and st.session_state.get("step", 0) >= len(QUESTIONS):
         st.divider()
         nav_button("Go to Dashboard", "dashboard")
 

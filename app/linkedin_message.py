@@ -2,6 +2,7 @@ import streamlit as st
 from services.claude_client import call_claude
 from prompts.linkedin_prompt import build_linkedin_prompt
 from database.db_client import save_linkedin_message
+from utils.helpers import render_followup_chat
 
 
 def run_linkedin_message() -> None:
@@ -33,3 +34,5 @@ def run_linkedin_message() -> None:
         st.divider()
         st.subheader("Your Message")
         st.markdown(result)
+
+        render_followup_chat("linkedin_message", result, profile)

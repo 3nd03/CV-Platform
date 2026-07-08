@@ -4,6 +4,7 @@ from services.claude_client import call_claude
 from prompts.cv_prompt import build_cv_prompt
 from services.s3_client import upload_cv
 from database.db_client import save_cv_upload, save_cv_analysis
+from utils.helpers import render_followup_chat
 
 
 def _extract_text(pdf_file) -> str:
@@ -43,3 +44,5 @@ def run_cv_analyser() -> None:
         st.divider()
         st.subheader("CV Analysis")
         st.markdown(result)
+
+        render_followup_chat("cv_analyser", result, profile)

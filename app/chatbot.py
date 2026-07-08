@@ -13,7 +13,10 @@ QUESTIONS = [
     ("open_to_learning", "Are there areas you are actively trying to develop or learn?"),
     ("timeline", "What is your job search timeline?"),
     ("self_gaps", "What do you feel are your biggest gaps for the role you are targeting?"),
+    ("access_needs", "Do you have any disabilities or access needs we should be aware of?"),
 ]
+
+OPTIONAL_KEYS = {"access_needs"}
 
 
 def _save_answer(key: str, answer: str) -> None:
@@ -41,15 +44,25 @@ def run_onboarding() -> None:
         return
 
     key, question = QUESTIONS[step]
+    optional = key in OPTIONAL_KEYS
     st.subheader(f"Question {step + 1} of {len(QUESTIONS)}")
-    st.write(question)
+    st.write(question + (" (optional, you can skip this or answer \"no\")" if optional else ""))
 
     with st.form(key=f"form_{step}"):
         answer = st.text_area("Your answer", key=f"input_{step}")
-        submitted = st.form_submit_button("Next")
+        col1, col2 = st.columns([1, 1]) if optional else (st.container(), None)
+        with col1:
+            submitted = st.form_submit_button("Next")
+        skipped = False
+        if optional:
+            with col2:
+                skipped = st.form_submit_button("Skip")
 
-    if submitted:
-        if not answer.strip():
+    if submitted or skipped:
+        if skipped:
+            _save_answer(key, "")
+            st.rerun()
+        elif not answer.strip() and not optional:
             st.warning("Please enter an answer before continuing.")
         else:
             _save_answer(key, answer.strip())
@@ -57,5 +70,5 @@ def run_onboarding() -> None:
 
 
 if __name__ == "__main__":
-    st.title("CV Platform — Onboarding")
+    st.title("Careerly — Onboarding")
     run_onboarding()

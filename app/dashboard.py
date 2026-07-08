@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.helpers import render_profile_summary, nav_button
+from utils.helpers import render_profile_summary, nav_button, render_followup_chat
 
 TOOLS = [
     ("Skill Gap Analysis", "skill_gap"),
@@ -35,3 +35,9 @@ def run_dashboard() -> None:
     for i, (label, target) in enumerate(TOOLS):
         with cols[i % 3]:
             nav_button(label, target)
+
+    dashboard_result = {
+        "profile_summary": profile,
+        "skill_gap_result": st.session_state.get("skill_gap_result"),
+    }
+    render_followup_chat("dashboard", dashboard_result, profile)

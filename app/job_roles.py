@@ -2,6 +2,7 @@ import streamlit as st
 from services.claude_client import call_claude
 from prompts.job_roles_prompt import build_job_roles_prompt
 from database.db_client import save_job_roles
+from utils.helpers import render_followup_chat
 
 
 def _parse_response(text: str) -> dict:
@@ -51,3 +52,5 @@ def run_job_roles() -> None:
 
     st.subheader("Target in Six Months")
     st.markdown(result.get("FUTURE_ROLES", "No data returned."))
+
+    render_followup_chat("job_roles", result, profile)

@@ -1,10 +1,10 @@
-# CV Platform
+# Careerly
 
 An AI-powered CV and career platform built for a charity hackathon. Users go through a short onboarding chat and land on a dashboard with tools for skill gap analysis, CV review, cover letters, job role suggestions, LinkedIn outreach, and interview prep.
 
 ## Features
 
-- **Onboarding chatbot**: 10 questions covering target role, skills, background, experience, and goals. Every other tool uses the profile this builds.
+- **Onboarding chatbot**: 11 questions covering target role, skills, background, experience, goals, and any disabilities or access needs. Every other tool uses the profile this builds.
 - **Dashboard**: profile summary, skill gap score, and links to all tools in one place.
 - **Skill gap analysis**: match score against the target role, what the user already has, what they're missing, and concrete next steps.
 - **CV analyser**: upload a PDF CV (text extracted with PyPDF2) for a structured review covering overall impression, strengths, weaknesses, and specific rewrite suggestions.
@@ -12,6 +12,7 @@ An AI-powered CV and career platform built for a charity hackathon. Users go thr
 - **Job role suggestions**: three roles to go for now, three to aim for in six months.
 - **LinkedIn message generator**: short cold outreach message built from the user profile, with an optional context field for who they're messaging.
 - **Interview prep**: five role-specific questions weighted towards the user's known skill gaps.
+- **Follow-up chat**: after using any tool, the user can ask a specific question about their result and get an answer grounded in that result and their profile.
 
 ## Setup
 
@@ -95,7 +96,7 @@ utils/
 
 **Accessibility**
 
-Runs in the browser with no install required, works with whatever device someone brings on the day. Outputs from Claude are written in plain language rather than technical jargon. Standard keyboard navigation works out of the box through Streamlit's default components. Screen reader and font scaling testing hasn't been done yet, that's a clear next step if this goes further.
+Runs in the browser with no install required, works with whatever device someone brings on the day. Outputs from Claude are written in plain language rather than technical jargon. Standard keyboard navigation works out of the box through Streamlit's default components. Onboarding now asks directly about disabilities or access needs, so the profile can account for this going forward. Screen reader and font scaling testing hasn't been done yet, that's a clear next step if this goes further.
 
 **Security**
 
@@ -110,3 +111,13 @@ The Claude API is pay-per-token, so cost tracks usage rather than sitting at a f
 - Built in a single day. This is a working prototype, not a production system.
 - No consent flow, data retention policy, or way for a user to request their data be deleted. Needed before any real deployment, since CVs contain personal data.
 - Built with one user in mind at a time, not tested under concurrent load.
+
+## Roadmap
+
+Features we'd want to add if this moves beyond the prototype stage:
+
+- **Text to speech**: read questions and results aloud, for users who find reading difficult or have visual impairments.
+- **Microphone (speech to text)**: answer onboarding questions by voice instead of typing.
+- **Job postings**: pull in live roles matched to the user's profile, rather than just suggesting role types.
+- **Culture alignment**: help users understand whether a company's culture is a good fit, not just whether their skills match.
+- **Career path videos**: short videos showing what a real career path looks like for a given role, to make the suggestions feel less abstract.

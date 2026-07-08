@@ -2,6 +2,7 @@ import streamlit as st
 from services.claude_client import call_claude
 from prompts.skill_gap_prompt import build_skill_gap_prompt
 from database.db_client import save_skill_gap
+from utils.helpers import render_followup_chat
 
 
 def _parse_response(text: str) -> dict:
@@ -56,3 +57,5 @@ def run_skill_gap() -> None:
 
     st.subheader("Next Steps")
     st.markdown(result.get("NEXT_STEPS", "No data returned."))
+
+    render_followup_chat("skill_gap", result, profile)

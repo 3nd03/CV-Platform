@@ -2,6 +2,7 @@ import streamlit as st
 from services.claude_client import call_claude
 from prompts.cover_letter_prompt import build_cover_letter_prompt
 from database.db_client import save_cover_letter
+from utils.helpers import render_followup_chat
 
 
 def run_cover_letter() -> None:
@@ -36,3 +37,5 @@ def run_cover_letter() -> None:
         st.divider()
         st.subheader("Your Cover Letter")
         st.markdown(result)
+
+        render_followup_chat("cover_letter", result, profile)

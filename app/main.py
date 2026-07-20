@@ -1,7 +1,9 @@
 import streamlit as st
-import uuid
+from streamlit_cookies_controller import CookieController
+from app.auth import run_login, run_signup, run_logout, try_remember_login, flush_pending_remember
 from app.chatbot import run_onboarding, QUESTIONS
 from app.dashboard import run_dashboard
+from app.profile import run_profile
 from app.skill_gap import run_skill_gap
 from app.cv_analyser import run_cv_analyser
 from app.cover_letter import run_cover_letter
@@ -73,15 +75,22 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
+cookies = CookieController()
+
+if "user" not in st.session_state:
+    try_remember_login(cookies)
+
+flush_pending_remember(cookies)
 
 if "page" not in st.session_state:
-    st.session_state.page = "onboarding"
+    st.session_state.page = "login"
+
+if not st.session_state.get("user") and st.session_state.page not in ("login", "signup"):
+    st.session_state.page = "login"
 
 page = st.session_state.page
 
-if page == "onboarding":
+if page in ("login", "signup"):
     st.markdown("""
     <div class="careerly-header">
         <p class="careerly-logo">Career<span>ly</span></p>
@@ -96,8 +105,16 @@ else:
         <p class="careerly-logo">Career<span>ly</span></p>
     </div>
     """, unsafe_allow_html=True)
+    if st.button("Log out"):
+        run_logout(cookies)
 
-if page == "onboarding":
+if page == "login":
+    run_login()
+
+elif page == "signup":
+    run_signup()
+
+elif page == "onboarding":
     run_onboarding()
 
     if st.session_state.get("profile") and st.session_state.get("step", 0) >= len(QUESTIONS):
@@ -106,6 +123,10 @@ if page == "onboarding":
 
 elif page == "dashboard":
     run_dashboard()
+
+elif page == "profile":
+    nav_button("Back to Dashboard", "dashboard")
+    run_profile()
 
 elif page == "skill_gap":
     nav_button("Back to Dashboard", "dashboard")

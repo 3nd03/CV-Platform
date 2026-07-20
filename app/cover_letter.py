@@ -28,7 +28,7 @@ def run_cover_letter() -> None:
                 letter_text = call_claude(prompt)
                 st.session_state.cover_letter_result = letter_text
                 try:
-                    save_cover_letter(st.session_state.session_id, job_description.strip(), letter_text)
+                    save_cover_letter(st.session_state.profile_id, job_description.strip(), letter_text)
                 except Exception:
                     st.warning("Could not save to database, continuing without persistence")
 

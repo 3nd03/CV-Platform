@@ -38,7 +38,7 @@ def run_skill_gap() -> None:
             result = _parse_response(response)
             st.session_state.skill_gap_result = result
             try:
-                save_skill_gap(st.session_state.session_id, result)
+                save_skill_gap(st.session_state.profile_id, result)
             except Exception:
                 st.warning("Could not save to database, continuing without persistence")
 

@@ -1,15 +1,10 @@
 import streamlit as st
-from PyPDF2 import PdfReader
 from services.claude_client import call_claude
 from prompts.cv_prompt import build_cv_prompt
 from services.s3_client import upload_cv
 from database.db_client import save_cv_upload, save_cv_analysis
 from utils.helpers import render_followup_chat
-
-
-def _extract_text(pdf_file) -> str:
-    reader = PdfReader(pdf_file)
-    return "\n".join(page.extract_text() or "" for page in reader.pages)
+from utils.pdf import extract_pdf_text
 
 
 def run_cv_analyser() -> None:
@@ -27,17 +22,29 @@ def run_cv_analyser() -> None:
             st.info("Upload your CV above before running the analysis.")
         else:
             with st.spinner("Analysing your CV..."):
-                cv_text = _extract_text(uploaded_file).strip()
+                cv_text = extract_pdf_text(uploaded_file).strip()
                 prompt = build_cv_prompt(profile, cv_text)
-                result = call_claude(prompt)
-                st.session_state.cv_result = result
-                try:
-                    session_id = st.session_state.session_id
-                    s3_key = upload_cv(uploaded_file.getvalue(), session_id, uploaded_file.name)
-                    save_cv_upload(session_id, s3_key)
-                    save_cv_analysis(session_id, result)
-                except Exception:
-                    st.warning("Could not save to database, continuing without persistence")
+                st.session_state.cv_result = call_claude(prompt)
+                st.session_state.cv_result_saved = False
+                st.session_state.cv_upload_bytes = uploaded_file.getvalue()
+                st.session_state.cv_upload_filename = uploaded_file.name
+
+    # Kept outside the button block and gated by its own flag so a Streamlit
+    # rerun landing mid-sequence retries this on the next run instead of
+    # leaving the CV uploaded but the analysis never linked to the profile.
+    if st.session_state.get("cv_result") and not st.session_state.get("cv_result_saved"):
+        try:
+            profile_id = st.session_state.profile_id
+            s3_key = upload_cv(
+                st.session_state.cv_upload_bytes,
+                profile_id,
+                st.session_state.cv_upload_filename,
+            )
+            save_cv_upload(profile_id, s3_key)
+            save_cv_analysis(profile_id, st.session_state.cv_result)
+            st.session_state.cv_result_saved = True
+        except Exception:
+            st.warning("Could not save to database, continuing without persistence")
 
     result = st.session_state.get("cv_result")
     if result:

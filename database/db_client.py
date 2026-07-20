@@ -1,143 +1,375 @@
 import os
 import json
+import secrets
+from datetime import datetime, timedelta
 import psycopg2
+import psycopg2.extras
 from dotenv import load_dotenv
 
 load_dotenv()
 
+RESULT_TABLES = {
+    "skill_gap": "skill_gap_results",
+    "cv_analysis": "cv_analysis_results",
+    "cover_letter": "cover_letters",
+    "job_roles": "job_role_suggestions",
+    "linkedin_message": "linkedin_messages",
+    "interview_prep": "interview_prep_results",
+}
+
+
 def get_connection():
     return psycopg2.connect(os.getenv("DATABASE_URL"))
+
 
 def init_db():
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS sessions (
-            session_id TEXT PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            display_name TEXT,
+            avatar_s3_key TEXT,
             created_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS profiles (
-            session_id TEXT REFERENCES sessions(session_id),
+            id SERIAL PRIMARY KEY,
+            user_id INT REFERENCES users(id) ON DELETE CASCADE,
+            label TEXT,
             data JSONB,
-            PRIMARY KEY (session_id)
+            cv_s3_key TEXT,
+            is_active BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS cv_uploads (
-            session_id TEXT REFERENCES sessions(session_id),
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
             s3_key TEXT,
             uploaded_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS skill_gap_results (
-            session_id TEXT REFERENCES sessions(session_id),
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
             result JSONB,
-            PRIMARY KEY (session_id)
+            created_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS cv_analysis_results (
-            session_id TEXT REFERENCES sessions(session_id),
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
             result JSONB,
-            PRIMARY KEY (session_id)
+            created_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS cover_letters (
-            session_id TEXT REFERENCES sessions(session_id),
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
             job_description TEXT,
             letter_text TEXT,
-            PRIMARY KEY (session_id)
+            created_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS job_role_suggestions (
-            session_id TEXT REFERENCES sessions(session_id),
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
             result JSONB,
-            PRIMARY KEY (session_id)
+            created_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS linkedin_messages (
-            session_id TEXT REFERENCES sessions(session_id),
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
             context TEXT,
             message_text TEXT,
-            PRIMARY KEY (session_id)
+            created_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS interview_prep_results (
-            session_id TEXT REFERENCES sessions(session_id),
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
             result JSONB,
-            PRIMARY KEY (session_id)
+            created_at TIMESTAMP DEFAULT NOW()
+        );
+        CREATE TABLE IF NOT EXISTS remember_tokens (
+            token TEXT PRIMARY KEY,
+            user_id INT REFERENCES users(id) ON DELETE CASCADE,
+            expires_at TIMESTAMP
         );
     """)
     conn.commit()
     cur.close()
     conn.close()
 
-def ensure_session(session_id):
+
+# --- users ---
+
+def create_user(email: str, password_hash: str, display_name: str = "") -> int:
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO sessions (session_id) VALUES (%s) ON CONFLICT DO NOTHING;",
-        (session_id,)
+        "INSERT INTO users (email, password_hash, display_name) VALUES (%s, %s, %s) RETURNING id;",
+        (email, password_hash, display_name),
+    )
+    user_id = cur.fetchone()[0]
+    conn.commit()
+    cur.close()
+    conn.close()
+    return user_id
+
+
+def get_user_by_email(email: str) -> dict | None:
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT * FROM users WHERE email = %s;", (email,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_user_by_id(user_id: int) -> dict | None:
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT * FROM users WHERE id = %s;", (user_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return dict(row) if row else None
+
+
+def update_user(user_id: int, **fields) -> None:
+    if not fields:
+        return
+    allowed = {"display_name", "avatar_s3_key", "password_hash"}
+    updates = {k: v for k, v in fields.items() if k in allowed}
+    if not updates:
+        return
+    set_clause = ", ".join(f"{col} = %s" for col in updates)
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        f"UPDATE users SET {set_clause} WHERE id = %s;",
+        (*updates.values(), user_id),
     )
     conn.commit()
     cur.close()
     conn.close()
 
-def _upsert(table, session_id, column, value):
+
+# --- profiles ---
+
+def create_profile(user_id: int, label: str, data: dict, cv_s3_key: str = None) -> int:
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO sessions (session_id) VALUES (%s) ON CONFLICT DO NOTHING;", (session_id,))
+    cur.execute("UPDATE profiles SET is_active = FALSE WHERE user_id = %s;", (user_id,))
     cur.execute(
-        f"""INSERT INTO {table} (session_id, {column}) VALUES (%s, %s)
-            ON CONFLICT (session_id) DO UPDATE SET {column} = EXCLUDED.{column};""",
-        (session_id, value)
+        """INSERT INTO profiles (user_id, label, data, cv_s3_key, is_active)
+           VALUES (%s, %s, %s, %s, TRUE) RETURNING id;""",
+        (user_id, label, json.dumps(data), cv_s3_key),
+    )
+    profile_id = cur.fetchone()[0]
+    conn.commit()
+    cur.close()
+    conn.close()
+    return profile_id
+
+
+def get_profiles_for_user(user_id: int) -> list[dict]:
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        "SELECT * FROM profiles WHERE user_id = %s ORDER BY created_at DESC;",
+        (user_id,),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_active_profile(user_id: int) -> dict | None:
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        "SELECT * FROM profiles WHERE user_id = %s AND is_active = TRUE LIMIT 1;",
+        (user_id,),
+    )
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return dict(row) if row else None
+
+
+def set_active_profile(user_id: int, profile_id: int) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE profiles SET is_active = FALSE WHERE user_id = %s;", (user_id,))
+    cur.execute(
+        "UPDATE profiles SET is_active = TRUE WHERE id = %s AND user_id = %s;",
+        (profile_id, user_id),
     )
     conn.commit()
     cur.close()
     conn.close()
 
-def save_profile(session_id, profile_dict):
-    _upsert("profiles", session_id, "data", json.dumps(profile_dict))
 
-def save_cv_upload(session_id, s3_key):
+def update_profile_label(profile_id: int, label: str) -> None:
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO sessions (session_id) VALUES (%s) ON CONFLICT DO NOTHING;", (session_id,))
+    cur.execute("UPDATE profiles SET label = %s WHERE id = %s;", (label, profile_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def set_profile_cv(profile_id: int, cv_s3_key: str) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE profiles SET cv_s3_key = %s WHERE id = %s;", (cv_s3_key, profile_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def update_profile(profile_id: int, data: dict) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
     cur.execute(
-        "INSERT INTO cv_uploads (session_id, s3_key) VALUES (%s, %s);",
-        (session_id, s3_key)
+        "UPDATE profiles SET data = %s WHERE id = %s;",
+        (json.dumps(data), profile_id),
     )
     conn.commit()
     cur.close()
     conn.close()
 
-def save_skill_gap(session_id, result_dict):
-    _upsert("skill_gap_results", session_id, "result", json.dumps(result_dict))
 
-def save_cv_analysis(session_id, result_dict):
-    _upsert("cv_analysis_results", session_id, "result", json.dumps(result_dict))
+# --- results (append-only history, keyed by profile_id) ---
 
-def save_cover_letter(session_id, job_description, letter_text):
+def save_cv_upload(profile_id: int, s3_key: str) -> None:
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO sessions (session_id) VALUES (%s) ON CONFLICT DO NOTHING;", (session_id,))
-    cur.execute("""
-        INSERT INTO cover_letters (session_id, job_description, letter_text)
-        VALUES (%s, %s, %s)
-        ON CONFLICT (session_id) DO UPDATE
-        SET job_description = EXCLUDED.job_description, letter_text = EXCLUDED.letter_text;
-    """, (session_id, job_description, letter_text))
+    cur.execute(
+        "INSERT INTO cv_uploads (profile_id, s3_key) VALUES (%s, %s);",
+        (profile_id, s3_key),
+    )
     conn.commit()
     cur.close()
     conn.close()
 
-def save_job_roles(session_id, result_dict):
-    _upsert("job_role_suggestions", session_id, "result", json.dumps(result_dict))
 
-def save_linkedin_message(session_id, context, message_text):
+def save_skill_gap(profile_id: int, result_dict: dict) -> None:
+    _insert(RESULT_TABLES["skill_gap"], profile_id, "result", json.dumps(result_dict))
+
+
+def save_cv_analysis(profile_id: int, result_dict) -> None:
+    _insert(RESULT_TABLES["cv_analysis"], profile_id, "result", json.dumps(result_dict))
+
+
+def save_cover_letter(profile_id: int, job_description: str, letter_text: str) -> None:
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO sessions (session_id) VALUES (%s) ON CONFLICT DO NOTHING;", (session_id,))
-    cur.execute("""
-        INSERT INTO linkedin_messages (session_id, context, message_text)
-        VALUES (%s, %s, %s)
-        ON CONFLICT (session_id) DO UPDATE
-        SET context = EXCLUDED.context, message_text = EXCLUDED.message_text;
-    """, (session_id, context, message_text))
+    cur.execute(
+        """INSERT INTO cover_letters (profile_id, job_description, letter_text)
+           VALUES (%s, %s, %s);""",
+        (profile_id, job_description, letter_text),
+    )
     conn.commit()
     cur.close()
     conn.close()
 
-def save_interview_prep(session_id, result_dict):
-    _upsert("interview_prep_results", session_id, "result", json.dumps(result_dict))
+
+def save_job_roles(profile_id: int, result_dict) -> None:
+    _insert(RESULT_TABLES["job_roles"], profile_id, "result", json.dumps(result_dict))
+
+
+def save_linkedin_message(profile_id: int, context: str, message_text: str) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """INSERT INTO linkedin_messages (profile_id, context, message_text)
+           VALUES (%s, %s, %s);""",
+        (profile_id, context, message_text),
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def save_interview_prep(profile_id: int, result_dict) -> None:
+    _insert(RESULT_TABLES["interview_prep"], profile_id, "result", json.dumps(result_dict))
+
+
+def _insert(table: str, profile_id: int, column: str, value) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        f"INSERT INTO {table} (profile_id, {column}) VALUES (%s, %s);",
+        (profile_id, value),
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def get_latest(tool_key: str, profile_id: int) -> dict | None:
+    table = RESULT_TABLES[tool_key]
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        f"SELECT * FROM {table} WHERE profile_id = %s ORDER BY created_at DESC LIMIT 1;",
+        (profile_id,),
+    )
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return dict(row) if row else None
+
+
+def create_remember_token(user_id: int, days: int = 30) -> str:
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.utcnow() + timedelta(days=days)
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO remember_tokens (token, user_id, expires_at) VALUES (%s, %s, %s);",
+        (token, user_id, expires_at),
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+    return token
+
+
+def get_user_by_remember_token(token: str) -> dict | None:
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        """SELECT u.* FROM users u
+           JOIN remember_tokens t ON t.user_id = u.id
+           WHERE t.token = %s AND t.expires_at > NOW();""",
+        (token,),
+    )
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return dict(row) if row else None
+
+
+def delete_remember_token(token: str) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM remember_tokens WHERE token = %s;", (token,))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def get_history(tool_key: str, profile_id: int) -> list[dict]:
+    table = RESULT_TABLES[tool_key]
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        f"SELECT * FROM {table} WHERE profile_id = %s ORDER BY created_at DESC;",
+        (profile_id,),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [dict(r) for r in rows]

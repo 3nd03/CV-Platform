@@ -4,7 +4,10 @@ An AI-powered CV and career platform built for a charity hackathon. Users go thr
 
 ## Features
 
+- **Accounts**: email/password signup and login, with a 30-day persistent session so returning users don't have to log in every visit.
+- **CV-based prefill**: onboarding opens with an optional CV upload. Claude extracts what it can (role, skills, background, experience, tools, location) into an editable review form, so the chatbot only asks what a CV can't answer.
 - **Onboarding chatbot**: 11 questions covering target role, skills, background, experience, goals, and any disabilities or access needs. Every other tool uses the profile this builds.
+- **Profile page**: inline editing of any profile field, account settings (name, avatar, password), multiple saved profiles per account (e.g. different target roles) with a switcher and rename, and a history view of past results per tool.
 - **Dashboard**: profile summary, skill gap score, and links to all tools in one place.
 - **Skill gap analysis**: match score against the target role, what the user already has, what they're missing, and concrete next steps.
 - **CV analyser**: upload a PDF CV (text extracted with PyPDF2) for a structured review covering overall impression, strengths, weaknesses, and specific rewrite suggestions.
@@ -48,8 +51,10 @@ streamlit run app/main.py
 
 ```
 app/
-  main.py              Entry point, routing via st.session_state.page
-  chatbot.py           Onboarding flow
+  main.py              Entry point, routing via st.session_state.page, login gate
+  auth.py              Signup, login, logout, remember-me cookie handling
+  profile.py           Account settings, profile editing/switching, history
+  chatbot.py           Onboarding flow, CV-based prefill
   dashboard.py         Profile summary, skill gap score, tool links
   skill_gap.py         Skill gap analysis
   cv_analyser.py       CV scoring and rewrite suggestions
@@ -60,10 +65,11 @@ app/
 
 services/
   claude_client.py     Single call_claude(prompt, system=""): all API calls go here
-  s3_client.py         AWS S3 storage, handles CV PDF uploads
+  s3_client.py         AWS S3 storage, handles CV PDFs and avatar uploads
+  auth_service.py      Password hashing/verification (bcrypt)
 
 database/
-  db_client.py         RDS Postgres, stores profile data and results from every feature
+  db_client.py         RDS Postgres: users, profiles, and per-tool result history
 
 prompts/
   skill_gap_prompt.py
@@ -72,9 +78,11 @@ prompts/
   job_roles_prompt.py
   linkedin_prompt.py
   interview_prep_prompt.py
+  profile_extraction_prompt.py
 
 utils/
   helpers.py           Shared profile rendering and navigation helpers
+  pdf.py               PDF text extraction, shared by CV Analyser and onboarding prefill
 ```
 
 ## Architecture
@@ -83,14 +91,15 @@ utils/
 - `call_claude` initialises the client inside the function on every call rather than at module level, so a rotated API key is always picked up without restarting the app.
 - Absolute imports work throughout via the editable install in `pyproject.toml`. No `sys.path` workarounds.
 - Page state and tool results are cached in `st.session_state`. Switching pages never triggers a repeat API call.
-- Each feature saves its result to its own table in RDS, linked by a session ID generated when the user opens the app. CV uploads go to S3, and the returned key gets stored alongside the profile.
+- Each feature saves its result to its own table in RDS, linked by `profile_id` rather than a browser session. Results are append-only, so past runs stay visible in the profile page's history rather than being overwritten by the next run.
+- CV uploads go to S3, and the returned key gets stored alongside the profile.
 - If a save to S3 or RDS fails, the app shows a warning and carries on. A database issue never blocks the user from finishing their session.
 
 ## Data persistence
 
-- Uploaded CV PDFs are stored in S3.
-- Everything else (profile answers, skill gap results, cover letters, and so on) is stored in RDS Postgres, one table per feature.
-- A session is identified by a UUID generated the first time the app loads in a browser. Nothing is written to the database until the user actually completes a step, so refreshing the page before that point doesn't create an empty row.
+- Uploaded CV PDFs and avatars are stored in S3.
+- Everything else (accounts, profiles, and every tool's results) is stored in RDS Postgres. A user can hold multiple profiles (e.g. different target roles); one is marked active at a time, and every result table keys off `profile_id`.
+- Login is by account (email/password), not a browser session. A signed, server-validated token in a cookie keeps a user logged in for 30 days without re-entering credentials.
 
 ## Accessibility, security and cost
 
@@ -100,7 +109,7 @@ Runs in the browser with no install required, works with whatever device someone
 
 **Security**
 
-API keys and AWS credentials live in `.env`, which is never committed. The AWS IAM user is scoped to only the S3 and RDS access it needs. There's no login system, each session is identified by a random ID rather than a personal account. RDS only accepts connections from specific whitelisted IP addresses.
+API keys and AWS credentials live in `.env`, which is never committed. The AWS IAM user is scoped to only the S3 and RDS access it needs. Passwords are hashed with bcrypt, never stored in plain text. The persistent login cookie holds an opaque, randomly generated token that's checked against the database on every use, not the user's credentials themselves, and is invalidated server-side on logout. RDS only accepts connections from specific whitelisted IP addresses.
 
 **Cost**
 
@@ -110,6 +119,7 @@ The Claude API is pay-per-token, so cost tracks usage rather than sitting at a f
 
 - Built in a single day. This is a working prototype, not a production system.
 - No consent flow, data retention policy, or way for a user to request their data be deleted. Needed before any real deployment, since CVs contain personal data.
+- No password reset flow. A user who forgets their password currently has no way to recover the account.
 - Built with one user in mind at a time, not tested under concurrent load.
 
 ## Roadmap

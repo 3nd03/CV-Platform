@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.helpers import render_profile_summary, nav_button, render_followup_chat
+from database.db_client import get_latest
 
 TOOLS = [
     ("Skill Gap Analysis", "skill_gap"),
@@ -21,7 +22,15 @@ def run_dashboard() -> None:
 
     st.subheader("Profile Summary")
     render_profile_summary(profile)
-    nav_button("Edit profile", "onboarding")
+    nav_button("Edit profile", "profile")
+
+    if "skill_gap_result" not in st.session_state:
+        try:
+            latest = get_latest("skill_gap", st.session_state.profile_id)
+            if latest:
+                st.session_state.skill_gap_result = latest["result"]
+        except Exception:
+            pass
 
     match_score = st.session_state.get("skill_gap_result", {}).get("MATCH_SCORE")
     st.subheader("Skill Gap Score")

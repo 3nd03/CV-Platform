@@ -25,7 +25,7 @@ def run_linkedin_message() -> None:
             message_text = call_claude(prompt)
             st.session_state.linkedin_result = message_text
             try:
-                save_linkedin_message(st.session_state.session_id, context.strip(), message_text)
+                save_linkedin_message(st.session_state.profile_id, context.strip(), message_text)
             except Exception:
                 st.warning("Could not save to database, continuing without persistence")
 

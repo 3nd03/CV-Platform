@@ -39,7 +39,7 @@ def run_job_roles() -> None:
             result = _parse_response(response)
             st.session_state.job_roles_result = result
             try:
-                save_job_roles(st.session_state.session_id, result)
+                save_job_roles(st.session_state.profile_id, result)
             except Exception:
                 st.warning("Could not save to database, continuing without persistence")
 

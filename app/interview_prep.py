@@ -23,7 +23,7 @@ def run_interview_prep() -> None:
             result = call_claude(prompt)
             st.session_state.interview_prep_result = result
             try:
-                save_interview_prep(st.session_state.session_id, result)
+                save_interview_prep(st.session_state.profile_id, result)
             except Exception:
                 st.warning("Could not save to database, continuing without persistence")
 

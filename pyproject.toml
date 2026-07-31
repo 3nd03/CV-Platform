@@ -3,7 +3,7 @@ name = "cv-platform"
 version = "0.1.0"
 
 [tool.setuptools]
-packages = ["app", "services", "database", "prompts", "utils"]
+packages = ["app", "services", "database", "prompts", "utils", "api", "api.routers"]
 
 [build-system]
 requires = ["setuptools"]

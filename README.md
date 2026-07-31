@@ -39,12 +39,21 @@ AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 AWS_REGION=your_region
 DATABASE_URL=postgresql://user:password@host:5432/dbname
+FRONTEND_URL=http://localhost:3000
 ```
 
 ## Running the app
 
 ```bash
 streamlit run app/main.py
+```
+
+## Running the API
+
+A FastAPI backend exposing the same tools over HTTP lives in `api/`, for use by a separate frontend.
+
+```bash
+uvicorn api.main:app --reload
 ```
 
 ## Project structure

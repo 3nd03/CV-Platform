@@ -108,6 +108,15 @@ def init_db():
             result JSONB,
             created_at TIMESTAMP DEFAULT NOW()
         );
+        CREATE TABLE IF NOT EXISTS applications (
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
+            company TEXT,
+            role TEXT,
+            date_applied DATE,
+            status TEXT DEFAULT 'Applied',
+            created_at TIMESTAMP DEFAULT NOW()
+        );
         CREATE TABLE IF NOT EXISTS remember_tokens (
             token TEXT PRIMARY KEY,
             user_id INT REFERENCES users(id) ON DELETE CASCADE,
@@ -327,6 +336,41 @@ def save_career_roadmap(profile_id: int, result_dict) -> None:
 
 def save_salary_insights(profile_id: int, result_dict) -> None:
     _insert(RESULT_TABLES["salary_insights"], profile_id, "result", json.dumps(result_dict))
+
+
+def save_application(profile_id: int, company: str, role: str, date_applied, status: str) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """INSERT INTO applications (profile_id, company, role, date_applied, status)
+           VALUES (%s, %s, %s, %s, %s);""",
+        (profile_id, company, role, date_applied, status),
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def get_applications(profile_id: int) -> list[dict]:
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        "SELECT * FROM applications WHERE profile_id = %s ORDER BY date_applied DESC, created_at DESC;",
+        (profile_id,),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def update_application_status(application_id: int, status: str) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE applications SET status = %s WHERE id = %s;", (status, application_id))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 
 def _insert(table: str, profile_id: int, column: str, value) -> None:

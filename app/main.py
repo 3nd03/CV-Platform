@@ -10,6 +10,7 @@ from app.cover_letter import run_cover_letter
 from app.job_roles import run_job_roles
 from app.linkedin_message import run_linkedin_message
 from app.interview_prep import run_interview_prep
+from app.cv_download import run_cv_download
 from utils.helpers import nav_button
 
 
@@ -151,3 +152,7 @@ elif page == "linkedin_message":
 elif page == "interview_prep":
     nav_button("Back to Dashboard", "dashboard")
     run_interview_prep()
+
+elif page == "cv_download":
+    nav_button("Back to Dashboard", "dashboard")
+    run_cv_download()

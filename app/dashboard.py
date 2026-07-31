@@ -9,6 +9,7 @@ TOOLS = [
     ("Job Role Suggestions", "job_roles"),
     ("LinkedIn Message", "linkedin_message"),
     ("Interview Prep", "interview_prep"),
+    ("CV Download", "cv_download"),
 ]
 
 

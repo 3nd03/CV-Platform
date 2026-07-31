@@ -15,6 +15,7 @@ RESULT_TABLES = {
     "job_roles": "job_role_suggestions",
     "linkedin_message": "linkedin_messages",
     "interview_prep": "interview_prep_results",
+    "cv_download": "cv_download_results",
 }
 
 
@@ -82,6 +83,12 @@ def init_db():
             created_at TIMESTAMP DEFAULT NOW()
         );
         CREATE TABLE IF NOT EXISTS interview_prep_results (
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
+            result JSONB,
+            created_at TIMESTAMP DEFAULT NOW()
+        );
+        CREATE TABLE IF NOT EXISTS cv_download_results (
             id SERIAL PRIMARY KEY,
             profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
             result JSONB,
@@ -294,6 +301,10 @@ def save_linkedin_message(profile_id: int, context: str, message_text: str) -> N
 
 def save_interview_prep(profile_id: int, result_dict) -> None:
     _insert(RESULT_TABLES["interview_prep"], profile_id, "result", json.dumps(result_dict))
+
+
+def save_cv_download(profile_id: int, result_dict) -> None:
+    _insert(RESULT_TABLES["cv_download"], profile_id, "result", json.dumps(result_dict))
 
 
 def _insert(table: str, profile_id: int, column: str, value) -> None:

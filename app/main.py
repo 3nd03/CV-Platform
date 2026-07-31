@@ -11,6 +11,7 @@ from app.job_roles import run_job_roles
 from app.linkedin_message import run_linkedin_message
 from app.interview_prep import run_interview_prep
 from app.cv_download import run_cv_download
+from app.career_roadmap import run_career_roadmap
 from utils.helpers import nav_button
 
 
@@ -156,3 +157,7 @@ elif page == "interview_prep":
 elif page == "cv_download":
     nav_button("Back to Dashboard", "dashboard")
     run_cv_download()
+
+elif page == "career_roadmap":
+    nav_button("Back to Dashboard", "dashboard")
+    run_career_roadmap()

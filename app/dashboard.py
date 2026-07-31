@@ -10,6 +10,7 @@ TOOLS = [
     ("LinkedIn Message", "linkedin_message"),
     ("Interview Prep", "interview_prep"),
     ("CV Download", "cv_download"),
+    ("Career Roadmap", "career_roadmap"),
 ]
 
 

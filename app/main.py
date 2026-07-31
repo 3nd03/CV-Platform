@@ -14,6 +14,7 @@ from app.cv_download import run_cv_download
 from app.career_roadmap import run_career_roadmap
 from app.salary_insights import run_salary_insights
 from app.application_tracker import run_application_tracker
+from app.cv_translator import run_cv_translator
 from utils.helpers import nav_button
 
 
@@ -171,3 +172,7 @@ elif page == "salary_insights":
 elif page == "application_tracker":
     nav_button("Back to Dashboard", "dashboard")
     run_application_tracker()
+
+elif page == "cv_translator":
+    nav_button("Back to Dashboard", "dashboard")
+    run_cv_translator()

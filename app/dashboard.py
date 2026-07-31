@@ -13,6 +13,7 @@ TOOLS = [
     ("Career Roadmap", "career_roadmap"),
     ("Salary Insights", "salary_insights"),
     ("Application Tracker", "application_tracker"),
+    ("CV Translator", "cv_translator"),
 ]
 
 

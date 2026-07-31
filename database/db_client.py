@@ -108,6 +108,13 @@ def init_db():
             result JSONB,
             created_at TIMESTAMP DEFAULT NOW()
         );
+        CREATE TABLE IF NOT EXISTS cv_translations (
+            id SERIAL PRIMARY KEY,
+            profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
+            target_language TEXT,
+            result TEXT,
+            created_at TIMESTAMP DEFAULT NOW()
+        );
         CREATE TABLE IF NOT EXISTS applications (
             id SERIAL PRIMARY KEY,
             profile_id INT REFERENCES profiles(id) ON DELETE CASCADE,
@@ -336,6 +343,19 @@ def save_career_roadmap(profile_id: int, result_dict) -> None:
 
 def save_salary_insights(profile_id: int, result_dict) -> None:
     _insert(RESULT_TABLES["salary_insights"], profile_id, "result", json.dumps(result_dict))
+
+
+def save_cv_translation(profile_id: int, target_language: str, result: str) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """INSERT INTO cv_translations (profile_id, target_language, result)
+           VALUES (%s, %s, %s);""",
+        (profile_id, target_language, result),
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
 
 
 def save_application(profile_id: int, company: str, role: str, date_applied, status: str) -> None:

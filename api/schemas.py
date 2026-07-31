@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from pydantic import BaseModel, Field
 
 
@@ -68,3 +68,51 @@ class ProfileOut(BaseModel):
 
 class ProfileLabelUpdate(BaseModel):
     label: str
+
+
+class CoverLetterRequest(BaseModel):
+    job_description: str
+
+
+class LinkedInRequest(BaseModel):
+    context: str = ""
+
+
+class CVDownloadRequest(BaseModel):
+    cv_text: str
+
+
+class CVTranslateRequest(BaseModel):
+    cv_text: str
+    target_language: str
+
+
+class ApplicationCreate(BaseModel):
+    company: str
+    role: str
+    date_applied: date
+    status: str = "Applied"
+
+
+class ApplicationOut(BaseModel):
+    id: int
+    profile_id: int
+    company: str
+    role: str
+    date_applied: date
+    status: str
+    created_at: datetime
+
+
+class ApplicationStatusUpdate(BaseModel):
+    status: str
+
+
+class FollowupRequest(BaseModel):
+    tool_name: str
+    previous_result: str | dict
+    question: str
+
+
+class FollowupResponse(BaseModel):
+    answer: str

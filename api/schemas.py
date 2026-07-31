@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, Field
 
 
@@ -21,3 +22,49 @@ class UserOut(BaseModel):
     id: int
     email: str
     display_name: str | None = None
+
+
+class ProfileData(BaseModel):
+    target_role: str = ""
+    current_skills: str = ""
+    background: str = ""
+    experience: str = ""
+    tools: str = ""
+    location: str = ""
+    salary: str = ""
+    open_to_learning: str = ""
+    timeline: str = ""
+    self_gaps: str = ""
+    access_needs: str = ""
+
+
+class ProfileCreate(ProfileData):
+    label: str = ""
+
+
+class ProfileUpdate(BaseModel):
+    target_role: str | None = None
+    current_skills: str | None = None
+    background: str | None = None
+    experience: str | None = None
+    tools: str | None = None
+    location: str | None = None
+    salary: str | None = None
+    open_to_learning: str | None = None
+    timeline: str | None = None
+    self_gaps: str | None = None
+    access_needs: str | None = None
+
+
+class ProfileOut(BaseModel):
+    id: int
+    user_id: int
+    label: str | None = None
+    data: dict
+    cv_s3_key: str | None = None
+    is_active: bool
+    created_at: datetime
+
+
+class ProfileLabelUpdate(BaseModel):
+    label: str

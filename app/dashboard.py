@@ -11,6 +11,7 @@ TOOLS = [
     ("Interview Prep", "interview_prep"),
     ("CV Download", "cv_download"),
     ("Career Roadmap", "career_roadmap"),
+    ("Salary Insights", "salary_insights"),
 ]
 
 

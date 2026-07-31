@@ -12,6 +12,7 @@ from app.linkedin_message import run_linkedin_message
 from app.interview_prep import run_interview_prep
 from app.cv_download import run_cv_download
 from app.career_roadmap import run_career_roadmap
+from app.salary_insights import run_salary_insights
 from utils.helpers import nav_button
 
 
@@ -161,3 +162,7 @@ elif page == "cv_download":
 elif page == "career_roadmap":
     nav_button("Back to Dashboard", "dashboard")
     run_career_roadmap()
+
+elif page == "salary_insights":
+    nav_button("Back to Dashboard", "dashboard")
+    run_salary_insights()

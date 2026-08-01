@@ -79,6 +79,11 @@ class CVPrefillResponse(BaseModel):
     location: str = ""
 
 
+class HistoryEntry(BaseModel):
+    content: str | dict
+    created_at: datetime
+
+
 class CoverLetterRequest(BaseModel):
     job_description: str
 

@@ -38,3 +38,8 @@ export async function cvPrefill(file) {
   })
   return data
 }
+
+export async function getProfileHistory() {
+  const { data } = await client.get('/profile/history')
+  return data
+}

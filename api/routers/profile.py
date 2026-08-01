@@ -11,11 +11,20 @@ from database.db_client import (
     set_active_profile,
     update_profile,
     update_profile_label,
+    get_history,
+    RESULT_TABLES,
 )
 from services.claude_client import call_claude
 from utils.pdf import extract_pdf_text
 from prompts.profile_extraction_prompt import build_profile_extraction_prompt
-from api.schemas import ProfileCreate, ProfileUpdate, ProfileOut, ProfileLabelUpdate, CVPrefillResponse
+from api.schemas import (
+    ProfileCreate,
+    ProfileUpdate,
+    ProfileOut,
+    ProfileLabelUpdate,
+    CVPrefillResponse,
+    HistoryEntry,
+)
 from api.dependencies import get_current_user, get_current_profile
 
 router = APIRouter(prefix="/profile", tags=["profile"])
@@ -94,3 +103,18 @@ def rename_profile(profile_id: int, payload: ProfileLabelUpdate, user: dict = De
     _ensure_owns_profile(user["id"], profile_id)
     update_profile_label(profile_id, payload.label)
     return {"detail": "Label updated"}
+
+
+@router.get("/history", response_model=dict[str, list[HistoryEntry]])
+def get_profile_history(profile: dict = Depends(get_current_profile)):
+    history = {}
+    for tool_key in RESULT_TABLES:
+        entries = get_history(tool_key, profile["id"])
+        history[tool_key] = [
+            {
+                "content": entry.get("result") or entry.get("letter_text") or entry.get("message_text") or "",
+                "created_at": entry["created_at"],
+            }
+            for entry in entries
+        ]
+    return history

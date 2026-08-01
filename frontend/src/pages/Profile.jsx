@@ -2,7 +2,36 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
-import { getProfile, updateProfile, getAllProfiles, activateProfile, renameProfile } from '../api/profile'
+import {
+  getProfile,
+  updateProfile,
+  getAllProfiles,
+  activateProfile,
+  renameProfile,
+  getProfileHistory,
+} from '../api/profile'
+
+const HISTORY_LABELS = {
+  skill_gap: 'Skill Gap Analysis',
+  cv_analysis: 'CV Analyser',
+  cover_letter: 'Cover Letter',
+  job_roles: 'Job Role Suggestions',
+  linkedin_message: 'LinkedIn Message',
+  interview_prep: 'Interview Prep',
+  cv_download: 'CV Download',
+  career_roadmap: 'Career Roadmap',
+  salary_insights: 'Salary Insights',
+}
+
+function formatHistoryContent(content) {
+  if (content && typeof content === 'object') {
+    return Object.entries(content)
+      .filter(([, value]) => value)
+      .map(([key, value]) => `${key.replaceAll('_', ' ')}: ${value}`)
+      .join('\n')
+  }
+  return content || ''
+}
 
 const PROFILE_LABELS = {
   target_role: 'Target role',
@@ -43,6 +72,10 @@ export default function Profile() {
   const [allProfiles, setAllProfiles] = useState([])
   const [renameDrafts, setRenameDrafts] = useState({})
 
+  const [history, setHistory] = useState(null)
+  const [historyError, setHistoryError] = useState('')
+  const [openHistoryTools, setOpenHistoryTools] = useState(() => new Set())
+
   useEffect(() => {
     getProfile()
       .then((data) => {
@@ -52,7 +85,22 @@ export default function Profile() {
         if (err.response?.status === 404) navigate('/onboarding')
       })
     refreshProfiles()
+    getProfileHistory()
+      .then(setHistory)
+      .catch(() => setHistoryError('Could not load history.'))
   }, [navigate])
+
+  function toggleHistoryTool(toolKey) {
+    setOpenHistoryTools((prev) => {
+      const next = new Set(prev)
+      if (next.has(toolKey)) {
+        next.delete(toolKey)
+      } else {
+        next.add(toolKey)
+      }
+      return next
+    })
+  }
 
   useEffect(() => {
     return () => {
@@ -221,7 +269,48 @@ export default function Profile() {
 
         <section id="history">
           <h2 className="font-bold text-teal mb-4 text-sm uppercase tracking-wide">History</h2>
-          <PlaceholderNote message="Past results per tool need a history endpoint that isn't available yet." />
+          {historyError && <PlaceholderNote message={historyError} />}
+          {!historyError && !history && <p className="text-body text-sm">Loading history...</p>}
+          {!historyError && history && (
+            <div className="space-y-2">
+              {Object.entries(HISTORY_LABELS).map(([toolKey, label]) => {
+                const entries = history[toolKey] || []
+                const isOpen = openHistoryTools.has(toolKey)
+                return (
+                  <div key={toolKey} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => toggleHistoryTool(toolKey)}
+                      className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 text-left transition-colors duration-150"
+                    >
+                      <span className="font-medium text-teal text-sm">{label}</span>
+                      <span className="text-xs text-gray-500">
+                        {entries.length} {entries.length === 1 ? 'result' : 'results'} {isOpen ? '▲' : '▼'}
+                      </span>
+                    </button>
+                    {isOpen && (
+                      <div className="p-4 space-y-3">
+                        {entries.length === 0 ? (
+                          <p className="text-body text-sm">No results yet.</p>
+                        ) : (
+                          entries.map((entry, i) => (
+                            <div key={i} className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-3">
+                              <p className="text-xs text-gray-500 mb-1">
+                                {new Date(entry.created_at).toLocaleString()}
+                              </p>
+                              <p className="text-body text-sm whitespace-pre-line">
+                                {formatHistoryContent(entry.content)}
+                              </p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </section>
       </Card>
     </Layout>

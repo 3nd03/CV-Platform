@@ -3,6 +3,7 @@ import { ReactFlow, Background, Controls, MiniMap, Handle, Position } from '@xyf
 import '@xyflow/react/dist/style.css'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import BackButton from '../components/BackButton'
 import FollowUpChat from '../components/FollowUpChat'
 import { runCareerRoadmap } from '../api/tools'
 import { markToolUsed } from '../utils/toolActivity'
@@ -172,7 +173,7 @@ function buildGraph(result) {
 function StageCard({ label, text }) {
   const items = bulletLines(text)
   return (
-    <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4">
+    <div className="bg-white border-l-[3px] border-mint rounded-r-lg p-4">
       <p className="text-xs uppercase tracking-wide text-mint font-semibold">{label}</p>
       <ul className="mt-2 list-disc list-inside space-y-1 text-body text-sm">
         {items.map((item, i) => (
@@ -206,14 +207,15 @@ export default function CareerRoadmap() {
 
   return (
     <Layout>
+      <BackButton />
       <Card>
-        <h1 className="text-xl font-bold text-teal mb-6">Career Roadmap</h1>
+        <h1 className="text-2xl font-bold text-teal mb-6">Career Roadmap</h1>
 
         <button
           type="button"
           onClick={handleRun}
           disabled={loading}
-          className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50 transition-colors duration-150"
+          className="w-full h-12 bg-mint text-teal rounded-[10px] font-medium disabled:opacity-50 hover:brightness-90 transition-all duration-200"
         >
           {loading ? 'Building...' : 'Build roadmap'}
         </button>

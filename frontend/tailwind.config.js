@@ -15,9 +15,13 @@ export default {
         label: '#6b7c6b',
         purple: '#7c3aed',
         gold: '#d97706',
+        'page-bg': '#f7f8fa',
+        'card-border': '#eeeeee',
+        'sidebar-border': '#f0f0f0',
       },
       boxShadow: {
-        card: '0 1px 3px rgba(0,0,0,0.08)',
+        card: '0 2px 8px rgba(0,0,0,0.06)',
+        'card-hover': '0 4px 16px rgba(0,0,0,0.1)',
       },
       transitionDuration: {
         DEFAULT: '150ms',

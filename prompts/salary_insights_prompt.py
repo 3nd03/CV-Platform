@@ -11,6 +11,8 @@ CANDIDATE PROFILE:
 
 Return your response using exactly these section labels, in this order. Do not add extra sections or change the label names. Do not use em dashes anywhere in the response.
 
+Always give salary figures in pounds sterling using the £ symbol. Never use dollars or the $ symbol, regardless of the candidate's location.
+
 RANGE_JUNIOR:
 <typical salary range for a junior-level candidate in this role and location>
 

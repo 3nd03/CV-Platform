@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import BackButton from '../components/BackButton'
 import FollowUpChat from '../components/FollowUpChat'
 import { runSalaryInsights } from '../api/tools'
 import { markToolUsed } from '../utils/toolActivity'
 
 function SalaryCard({ level, range }) {
   return (
-    <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4">
-      <p className="text-xs uppercase tracking-wide text-label">{level}</p>
+    <div className="bg-white border-l-[3px] border-mint rounded-r-lg p-4">
+      <p className="text-[11px] uppercase tracking-wide text-label">{level}</p>
       <p className="text-lg font-bold text-teal mt-1">{range || 'No data returned.'}</p>
     </div>
   )
@@ -31,14 +32,15 @@ export default function SalaryInsights() {
 
   return (
     <Layout>
+      <BackButton />
       <Card>
-        <h1 className="text-xl font-bold text-teal mb-6">Salary Insights</h1>
+        <h1 className="text-2xl font-bold text-teal mb-6">Salary Insights</h1>
 
         <button
           type="button"
           onClick={handleRun}
           disabled={loading}
-          className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50 transition-colors duration-150"
+          className="w-full h-12 bg-mint text-teal rounded-[10px] font-medium disabled:opacity-50 hover:brightness-90 transition-all duration-200"
         >
           {loading ? 'Researching...' : 'Get salary insights'}
         </button>
@@ -52,12 +54,12 @@ export default function SalaryInsights() {
                 <SalaryCard level="Senior" range={result.RANGE_SENIOR} />
               </div>
 
-              <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4">
+              <div className="bg-white border-l-[3px] border-mint rounded-r-lg p-4">
                 <h3 className="font-bold text-teal mb-1 text-sm">Factors Affecting Salary</h3>
                 <p className="text-body text-sm whitespace-pre-line">{result.FACTORS || 'No data returned.'}</p>
               </div>
 
-              <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4">
+              <div className="bg-white border-l-[3px] border-mint rounded-r-lg p-4">
                 <h3 className="font-bold text-teal mb-1 text-sm">Negotiation Tips</h3>
                 <p className="text-body text-sm whitespace-pre-line">
                   {result.NEGOTIATION_TIPS || 'No data returned.'}

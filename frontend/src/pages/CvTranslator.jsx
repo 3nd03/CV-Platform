@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import BackButton from '../components/BackButton'
 import { runCvTranslate, downloadBlob } from '../api/tools'
 import { markToolUsed } from '../utils/toolActivity'
 
@@ -35,22 +36,23 @@ export default function CvTranslator() {
 
   return (
     <Layout>
+      <BackButton />
       <Card>
-        <h1 className="text-xl font-bold text-teal mb-6">CV Language Translator</h1>
+        <h1 className="text-2xl font-bold text-teal mb-6">CV Language Translator</h1>
 
-        <label className="text-xs uppercase tracking-wide text-label">CV text</label>
+        <label className="text-[11px] uppercase tracking-wide text-label">CV text</label>
         <textarea
           rows={12}
           value={cvText}
           onChange={(e) => setCvText(e.target.value)}
-          className="mt-1 w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-body focus:outline-none focus:border-mint transition-colors duration-150"
+          className="mt-1 w-full bg-white border border-card-border rounded-[10px] px-4 py-3 text-sm text-body focus:outline-none focus:border-mint transition-colors duration-200"
         />
 
-        <label className="text-xs uppercase tracking-wide text-label mt-4 block">Translate to</label>
+        <label className="text-[11px] uppercase tracking-wide text-label mt-4 block">Translate to</label>
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
-          className="mt-1 w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint transition-colors duration-150"
+          className="mt-1 w-full bg-white border border-card-border rounded-[10px] px-4 py-2.5 text-sm text-body focus:outline-none focus:border-mint transition-colors duration-200"
         >
           {LANGUAGES.map((lang) => (
             <option key={lang} value={lang}>
@@ -63,7 +65,7 @@ export default function CvTranslator() {
           type="button"
           onClick={handleTranslate}
           disabled={loading}
-          className="w-full bg-mint text-teal rounded-lg py-3 font-medium mt-4 disabled:opacity-50 transition-colors duration-150"
+          className="w-full h-12 bg-mint text-teal rounded-[10px] font-medium mt-4 disabled:opacity-50 hover:brightness-90 transition-all duration-200"
         >
           {loading ? 'Translating...' : 'Translate and download'}
         </button>

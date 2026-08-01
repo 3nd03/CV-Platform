@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import BackButton from '../components/BackButton'
 import { getApplications, addApplication, updateApplicationStatus } from '../api/tools'
 import { markToolUsed } from '../utils/toolActivity'
 
@@ -62,45 +63,46 @@ export default function ApplicationTracker() {
 
   return (
     <Layout>
+      <BackButton />
       <Card>
-        <h1 className="text-xl font-bold text-teal mb-6">Application Tracker</h1>
+        <h1 className="text-2xl font-bold text-teal mb-6">Application Tracker</h1>
 
-        <form onSubmit={handleAdd} className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-5 space-y-4">
+        <form onSubmit={handleAdd} className="bg-white border-l-[3px] border-mint rounded-r-lg p-5 space-y-4">
           <h2 className="font-bold text-teal text-sm">Add an application</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs uppercase tracking-wide text-label">Company</label>
+              <label className="text-[11px] uppercase tracking-wide text-label">Company</label>
               <input
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className="mt-1 w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint transition-colors duration-150"
+                className="mt-1 w-full bg-white border border-card-border rounded-[10px] px-4 py-2.5 text-sm text-body focus:outline-none focus:border-mint transition-colors duration-200"
               />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-wide text-label">Role</label>
+              <label className="text-[11px] uppercase tracking-wide text-label">Role</label>
               <input
                 type="text"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="mt-1 w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint transition-colors duration-150"
+                className="mt-1 w-full bg-white border border-card-border rounded-[10px] px-4 py-2.5 text-sm text-body focus:outline-none focus:border-mint transition-colors duration-200"
               />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-wide text-label">Date applied</label>
+              <label className="text-[11px] uppercase tracking-wide text-label">Date applied</label>
               <input
                 type="date"
                 value={dateApplied}
                 onChange={(e) => setDateApplied(e.target.value)}
-                className="mt-1 w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint transition-colors duration-150"
+                className="mt-1 w-full bg-white border border-card-border rounded-[10px] px-4 py-2.5 text-sm text-body focus:outline-none focus:border-mint transition-colors duration-200"
               />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-wide text-label">Status</label>
+              <label className="text-[11px] uppercase tracking-wide text-label">Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="mt-1 w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint transition-colors duration-150"
+                className="mt-1 w-full bg-white border border-card-border rounded-[10px] px-4 py-2.5 text-sm text-body focus:outline-none focus:border-mint transition-colors duration-200"
               >
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>
@@ -114,7 +116,7 @@ export default function ApplicationTracker() {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-mint text-teal rounded-lg px-6 py-2.5 font-medium disabled:opacity-50 transition-colors duration-150"
+            className="h-12 px-6 bg-mint text-teal rounded-[10px] font-medium disabled:opacity-50 hover:brightness-90 transition-all duration-200"
           >
             {submitting ? 'Adding...' : 'Add application'}
           </button>
@@ -123,7 +125,7 @@ export default function ApplicationTracker() {
         <div className="mt-6 overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-label border-b border-gray-200">
+              <tr className="text-left text-[11px] uppercase tracking-wide text-label border-b border-card-border">
                 <th className="py-2 pr-4">Company</th>
                 <th className="py-2 pr-4">Role</th>
                 <th className="py-2 pr-4">Date applied</th>
@@ -140,7 +142,7 @@ export default function ApplicationTracker() {
                     <select
                       value={app.status}
                       onChange={(e) => handleStatusChange(app.id, e.target.value)}
-                      className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-body text-sm focus:outline-none focus:border-mint transition-colors duration-150"
+                      className="bg-white border border-card-border rounded-[10px] px-3 py-1.5 text-body text-sm focus:outline-none focus:border-mint transition-colors duration-200"
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s}>

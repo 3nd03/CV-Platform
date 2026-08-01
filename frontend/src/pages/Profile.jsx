@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import BackButton from '../components/BackButton'
 import {
   getProfile,
   updateProfile,
@@ -47,7 +48,7 @@ function HistoryEntryRow({ entryKey, entry, isOpen, onToggle }) {
       <button
         type="button"
         onClick={() => onToggle(entryKey)}
-        className="w-full flex items-center gap-3 px-2 py-2 text-left rounded-lg hover:bg-mint-light transition-colors duration-150"
+        className="w-full flex items-center gap-3 px-2 py-2 text-left rounded-lg hover:bg-mint-light transition-colors duration-200"
       >
         <span className="text-xs text-gray-500 shrink-0">{new Date(entry.created_at).toLocaleDateString()}</span>
         <span className="flex-1 text-body text-sm truncate">{historyPreview(entry.content)}</span>
@@ -55,7 +56,7 @@ function HistoryEntryRow({ entryKey, entry, isOpen, onToggle }) {
       </button>
       {isOpen && (
         <div className="px-2 pb-3">
-          <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-3">
+          <div className="bg-white border-l-[3px] border-mint rounded-r-lg p-3">
             <p className="text-xs text-gray-500 mb-1">{new Date(entry.created_at).toLocaleString()}</p>
             <p className="text-body text-sm whitespace-pre-line">{formatHistoryContent(entry.content)}</p>
           </div>
@@ -214,8 +215,9 @@ export default function Profile() {
 
   return (
     <Layout>
+      <BackButton />
       <Card>
-        <h1 className="text-xl font-bold text-teal mb-6">Profile</h1>
+        <h1 className="text-2xl font-bold text-teal mb-6">Profile</h1>
 
         <section>
           <h2 className="font-bold text-teal mb-4 text-sm uppercase tracking-wide">Account</h2>
@@ -255,7 +257,7 @@ export default function Profile() {
                   rows={2}
                   value={fields[key] || ''}
                   onChange={(e) => setFields((prev) => ({ ...prev, [key]: e.target.value }))}
-                  className="mt-1 w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint transition-colors duration-150"
+                  className="mt-1 w-full bg-white border border-card-border rounded-[10px] px-4 py-2.5 text-sm text-body focus:outline-none focus:border-mint transition-colors duration-200"
                 />
               </div>
             ))}
@@ -263,7 +265,7 @@ export default function Profile() {
             <button
               type="submit"
               disabled={savingProfile}
-              className="bg-mint text-teal rounded-lg px-6 py-2.5 font-medium disabled:opacity-50 transition-colors duration-150"
+              className="bg-mint text-teal rounded-[10px] px-6 py-2.5 font-medium disabled:opacity-50 hover:brightness-90 transition-all duration-200"
             >
               {savingProfile ? 'Saving...' : 'Save changes'}
             </button>
@@ -278,7 +280,7 @@ export default function Profile() {
             {allProfiles.map((p) => (
               <div
                 key={p.id}
-                className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4 flex items-center justify-between gap-3"
+                className="bg-white border-l-[3px] border-mint rounded-r-lg p-4 flex items-center justify-between gap-3"
               >
                 <div>
                   <p className="font-medium text-teal text-sm">
@@ -291,7 +293,7 @@ export default function Profile() {
                     <button
                       type="button"
                       onClick={() => handleSwitch(p.id)}
-                      className="border border-gray-200 text-teal bg-white rounded-lg px-3 py-1.5 text-sm transition-colors duration-150"
+                      className="border border-card-border text-teal bg-white rounded-[10px] px-3 py-1.5 text-sm transition-colors duration-200"
                     >
                       Switch
                     </button>
@@ -301,12 +303,12 @@ export default function Profile() {
                     placeholder="New name"
                     value={renameDrafts[p.id] ?? ''}
                     onChange={(e) => setRenameDrafts((prev) => ({ ...prev, [p.id]: e.target.value }))}
-                    className="bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-sm w-32"
+                    className="bg-white border border-card-border rounded-[10px] px-2 py-1.5 text-sm w-32"
                   />
                   <button
                     type="button"
                     onClick={() => handleRename(p.id)}
-                    className="border border-gray-200 text-teal bg-white rounded-lg px-3 py-1.5 text-sm transition-colors duration-150"
+                    className="border border-card-border text-teal bg-white rounded-[10px] px-3 py-1.5 text-sm transition-colors duration-200"
                   >
                     Rename
                   </button>
@@ -317,7 +319,7 @@ export default function Profile() {
           <button
             type="button"
             onClick={() => navigate('/onboarding')}
-            className="mt-4 border border-gray-200 text-teal bg-white rounded-lg px-4 py-2 text-sm transition-colors duration-150"
+            className="mt-4 border border-card-border text-teal bg-white rounded-[10px] px-4 py-2 text-sm transition-colors duration-200"
           >
             + New profile
           </button>
@@ -338,11 +340,11 @@ export default function Profile() {
                 const visibleEntries = showAll ? entries : entries.slice(0, HISTORY_PREVIEW_LIMIT)
                 const hiddenCount = entries.length - visibleEntries.length
                 return (
-                  <div key={toolKey} className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div key={toolKey} className="border border-card-border rounded-lg overflow-hidden">
                     <button
                       type="button"
                       onClick={() => toggleHistoryTool(toolKey)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 text-left transition-colors duration-150"
+                      className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 text-left transition-colors duration-200"
                     >
                       <span className="font-medium text-teal text-sm">{label}</span>
                       <span className="text-xs text-gray-500">

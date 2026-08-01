@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import BackButton from '../components/BackButton'
 import FollowUpChat from '../components/FollowUpChat'
 import { runJobRoles } from '../api/tools'
 import { markToolUsed } from '../utils/toolActivity'
@@ -17,7 +18,7 @@ function RoleList({ title, items }) {
       <h2 className="font-bold text-teal mb-3 text-sm">{title}</h2>
       <div className="space-y-2">
         {items.map((item, i) => (
-          <div key={i} className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-3 flex gap-3 items-start">
+          <div key={i} className="bg-white border-l-[3px] border-mint rounded-r-lg p-3 flex gap-3 items-start">
             <span className="w-6 h-6 shrink-0 rounded-full bg-mint text-teal font-bold flex items-center justify-center text-xs">
               {i + 1}
             </span>
@@ -50,14 +51,15 @@ export default function JobRoles() {
 
   return (
     <Layout>
+      <BackButton />
       <Card>
-        <h1 className="text-xl font-bold text-teal mb-6">Job Role Suggestions</h1>
+        <h1 className="text-2xl font-bold text-teal mb-6">Job Role Suggestions</h1>
 
         <button
           type="button"
           onClick={handleRun}
           disabled={loading}
-          className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50 transition-colors duration-150"
+          className="w-full h-12 bg-mint text-teal rounded-[10px] font-medium disabled:opacity-50 hover:brightness-90 transition-all duration-200"
         >
           {loading ? 'Matching roles...' : 'Suggest roles'}
         </button>

@@ -43,13 +43,13 @@ export default function FollowUpChat({ toolName, result }) {
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask about this result..."
-          className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint transition-colors duration-150"
+          className="flex-1 bg-white border border-card-border rounded-[10px] px-4 py-2.5 text-sm text-body focus:outline-none focus:border-mint transition-colors duration-200"
         />
         <button
           type="button"
           onClick={handleSend}
           disabled={loading}
-          className="bg-mint text-teal rounded-lg px-6 py-2 font-medium disabled:opacity-50 transition-colors duration-150"
+          className="bg-mint text-teal rounded-[10px] px-6 font-medium disabled:opacity-50 hover:brightness-90 transition-all duration-200"
         >
           {loading ? 'Sending...' : 'Send'}
         </button>

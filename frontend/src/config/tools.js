@@ -6,7 +6,7 @@ import {
   Mic,
   Download,
   Map,
-  DollarSign,
+  PoundSterling,
   CheckSquare,
   Globe,
 } from 'lucide-react'
@@ -19,7 +19,6 @@ export const TOOLS = [
     icon: BarChart2,
     name: 'Skill Gap Analysis',
     description: 'See how you match your target role.',
-    border: 'border-mint',
     text: 'text-mint',
   },
   {
@@ -28,7 +27,6 @@ export const TOOLS = [
     icon: FileText,
     name: 'CV Analyser',
     description: 'Upload your CV for a structured review.',
-    border: 'border-teal',
     text: 'text-teal',
   },
   {
@@ -37,7 +35,6 @@ export const TOOLS = [
     icon: Mail,
     name: 'Cover Letter',
     description: 'Generate a tailored cover letter.',
-    border: 'border-purple',
     text: 'text-purple',
   },
   {
@@ -46,7 +43,6 @@ export const TOOLS = [
     icon: Briefcase,
     name: 'Job Role Suggestions',
     description: 'Roles to target now and in six months.',
-    border: 'border-gold',
     text: 'text-gold',
   },
   {
@@ -55,7 +51,6 @@ export const TOOLS = [
     icon: LinkedinIcon,
     name: 'LinkedIn Message',
     description: 'Draft a cold outreach message.',
-    border: 'border-blue-600',
     text: 'text-blue-600',
   },
   {
@@ -64,7 +59,6 @@ export const TOOLS = [
     icon: Mic,
     name: 'Interview Prep',
     description: 'Practice role-specific questions.',
-    border: 'border-pink-600',
     text: 'text-pink-600',
   },
   {
@@ -73,7 +67,6 @@ export const TOOLS = [
     icon: Download,
     name: 'CV Download',
     description: 'Get an ATS-friendly CV as a PDF.',
-    border: 'border-cyan-600',
     text: 'text-cyan-600',
   },
   {
@@ -82,16 +75,14 @@ export const TOOLS = [
     icon: Map,
     name: 'Career Roadmap',
     description: 'Milestones from now to one year out.',
-    border: 'border-orange-600',
     text: 'text-orange-600',
   },
   {
     to: '/salary-insights',
     doneKey: 'salary_insights',
-    icon: DollarSign,
+    icon: PoundSterling,
     name: 'Salary Insights',
     description: 'Ranges and negotiation tips.',
-    border: 'border-emerald-600',
     text: 'text-emerald-600',
   },
   {
@@ -100,7 +91,6 @@ export const TOOLS = [
     icon: CheckSquare,
     name: 'Application Tracker',
     description: 'Track every application in one place.',
-    border: 'border-indigo-600',
     text: 'text-indigo-600',
   },
   {
@@ -109,7 +99,6 @@ export const TOOLS = [
     icon: Globe,
     name: 'CV Translator',
     description: 'Translate your CV into another language.',
-    border: 'border-rose-600',
     text: 'text-rose-600',
   },
 ]

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import BackButton from '../components/BackButton'
 import SkillGapScore from '../components/SkillGapScore'
 import FollowUpChat from '../components/FollowUpChat'
 import { runSkillGap } from '../api/tools'
@@ -8,7 +9,7 @@ import { markToolUsed } from '../utils/toolActivity'
 
 function ResultCard({ title, children }) {
   return (
-    <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4">
+    <div className="bg-white border-l-[3px] border-mint rounded-r-lg p-4">
       <h3 className="font-bold text-teal mb-1 text-sm">{title}</h3>
       <p className="text-body text-sm whitespace-pre-line">{children}</p>
     </div>
@@ -38,14 +39,15 @@ export default function SkillGap() {
 
   return (
     <Layout>
+      <BackButton />
       <Card>
-        <h1 className="text-xl font-bold text-teal mb-6">Skill Gap Analysis</h1>
+        <h1 className="text-2xl font-bold text-teal mb-6">Skill Gap Analysis</h1>
 
         <button
           type="button"
           onClick={handleRun}
           disabled={loading}
-          className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50 transition-colors duration-150"
+          className="w-full h-12 bg-mint text-teal rounded-[10px] font-medium disabled:opacity-50 hover:brightness-90 transition-all duration-200"
         >
           {loading ? 'Analysing...' : 'Run analysis'}
         </button>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import BackButton from '../components/BackButton'
 import FollowUpChat from '../components/FollowUpChat'
 import { runInterviewPrep } from '../api/tools'
 import { markToolUsed } from '../utils/toolActivity'
@@ -40,11 +41,12 @@ export default function InterviewPrep() {
 
   return (
     <Layout>
+      <BackButton />
       <Card>
-        <h1 className="text-xl font-bold text-teal mb-6">Interview Prep</h1>
+        <h1 className="text-2xl font-bold text-teal mb-6">Interview Prep</h1>
 
         {!skillGapDone && (
-          <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4 mb-4 text-body text-sm">
+          <div className="bg-white border-l-[3px] border-mint rounded-r-lg p-4 mb-4 text-body text-sm">
             Tip: run the Skill Gap Analysis first for questions targeted at your weaker areas.
           </div>
         )}
@@ -53,7 +55,7 @@ export default function InterviewPrep() {
           type="button"
           onClick={handleGenerate}
           disabled={loading}
-          className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50 transition-colors duration-150"
+          className="w-full h-12 bg-mint text-teal rounded-[10px] font-medium disabled:opacity-50 hover:brightness-90 transition-all duration-200"
         >
           {loading ? 'Preparing...' : 'Generate questions'}
         </button>
@@ -62,7 +64,7 @@ export default function InterviewPrep() {
           <>
             <div className="mt-6 space-y-3">
               {questions.map((q, i) => (
-                <div key={i} className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4 flex gap-3 items-start">
+                <div key={i} className="bg-white border-l-[3px] border-mint rounded-r-lg p-4 flex gap-3 items-start">
                   <span className="w-6 h-6 shrink-0 rounded-full bg-mint text-teal font-bold flex items-center justify-center text-xs">
                     {i + 1}
                   </span>

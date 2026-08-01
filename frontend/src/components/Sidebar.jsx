@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ChevronUp, UserPen, Users, History, LogOut, Power } from 'lucide-react'
+import { LayoutDashboard, ChevronUp, UserPen, Users, History, LogOut } from 'lucide-react'
 import { TOOLS } from '../config/tools'
 import { logout } from '../api/auth'
 import Logo from './Logo'
@@ -110,33 +110,23 @@ export default function Sidebar() {
           </div>
         )}
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            className="flex-1 min-w-0 flex items-center gap-3 text-left"
-          >
-            <span className="w-9 h-9 shrink-0 rounded-full bg-mint text-teal font-bold flex items-center justify-center">
-              {initial}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-sm font-medium text-teal truncate">{displayName}</span>
-              <span className="block text-xs text-gray-500 truncate">{email}</span>
-            </span>
-            <ChevronUp
-              size={14}
-              className={`shrink-0 text-gray-500 transition-transform duration-200 ${menuOpen ? '' : 'rotate-180'}`}
-            />
-          </button>
-          <button
-            type="button"
-            onClick={handleLogout}
-            title="Log out"
-            className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-mint-light hover:text-teal transition-colors duration-200"
-          >
-            <Power size={16} />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          className="w-full flex items-center gap-3 text-left"
+        >
+          <span className="w-9 h-9 shrink-0 rounded-full bg-mint text-teal font-bold flex items-center justify-center">
+            {initial}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-medium text-teal truncate">{displayName}</span>
+            <span className="block text-xs text-gray-500 truncate">{email}</span>
+          </span>
+          <ChevronUp
+            size={14}
+            className={`shrink-0 text-gray-500 transition-transform duration-200 ${menuOpen ? '' : 'rotate-180'}`}
+          />
+        </button>
       </div>
     </aside>
   )

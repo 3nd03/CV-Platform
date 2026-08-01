@@ -10,14 +10,14 @@ import { markToolUsed } from '../utils/toolActivity'
 // The backend already splits the roadmap into four labelled sections
 // (WHERE_NOW, THREE_MONTH, SIX_MONTH, ONE_YEAR) rather than one flat text
 // blob with embedded stage headings, so the "stage heading" detection this
-// diagram needs is really just this fixed mapping. What still needs parsing
-// per the brief is stripping bullets/asterisks/numbering from each stage's
-// text and splitting it into individual milestone lines.
+// diagram needs is really just this fixed mapping. The prompt now returns
+// every section, including WHERE_NOW, as short bullet points rather than a
+// prose paragraph, so all four stages parse the same way.
 const STAGES = [
-  { key: 'WHERE_NOW', label: 'Now', bulleted: false },
-  { key: 'THREE_MONTH', label: '3 Months', bulleted: true },
-  { key: 'SIX_MONTH', label: '6 Months', bulleted: true },
-  { key: 'ONE_YEAR', label: '1 Year', bulleted: true },
+  { key: 'WHERE_NOW', label: 'Now' },
+  { key: 'THREE_MONTH', label: '3 Months' },
+  { key: 'SIX_MONTH', label: '6 Months' },
+  { key: 'ONE_YEAR', label: '1 Year' },
 ]
 
 const HEADER_WIDTH = 200
@@ -25,9 +25,10 @@ const HEADER_MIN_HEIGHT = 48
 const MILESTONE_WIDTH = 280
 // Milestone node height is intrinsic (auto), this is only an estimate used to
 // space rows out vertically so wrapped text has room without nodes overlapping.
-const MILESTONE_HEIGHT_ESTIMATE = 80
+const MILESTONE_HEIGHT_ESTIMATE = 90
 const CENTER_X = 0
-const GAP_WITHIN_STAGE = 80
+const GAP_HEADER_TO_MILESTONE = 140
+const GAP_BETWEEN_MILESTONES = 80
 const GAP_BETWEEN_STAGES = 120
 
 const NODE_CONTENT_STYLE = {
@@ -128,7 +129,7 @@ function buildGraph(result) {
     }
 
     const rawText = result?.[stage.key] || ''
-    const milestones = stage.bulleted ? bulletLines(rawText) : [rawText.trim()].filter(Boolean)
+    const milestones = bulletLines(rawText)
 
     if (milestones.length === 0) {
       // Nothing to fan out to, so the header itself bridges straight to the next stage.
@@ -137,7 +138,7 @@ function buildGraph(result) {
       continue
     }
 
-    y += HEADER_MIN_HEIGHT + GAP_WITHIN_STAGE
+    y += HEADER_MIN_HEIGHT + GAP_HEADER_TO_MILESTONE
 
     let lastMilestoneId = null
     milestones.forEach((text, i) => {
@@ -157,7 +158,7 @@ function buildGraph(result) {
         style: { stroke: '#abebd9', strokeWidth: 2 },
       })
       const isLastInStage = i === milestones.length - 1
-      y += MILESTONE_HEIGHT_ESTIMATE + (isLastInStage ? GAP_BETWEEN_STAGES : GAP_WITHIN_STAGE)
+      y += MILESTONE_HEIGHT_ESTIMATE + (isLastInStage ? GAP_BETWEEN_STAGES : GAP_BETWEEN_MILESTONES)
       lastMilestoneId = id
       milestoneCount += 1
     })
@@ -168,20 +169,16 @@ function buildGraph(result) {
   return { nodes, edges, milestoneCount, contentHeight: y }
 }
 
-function StageCard({ label, text, bulleted }) {
-  const items = bulleted ? bulletLines(text) : null
+function StageCard({ label, text }) {
+  const items = bulletLines(text)
   return (
     <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4">
       <p className="text-xs uppercase tracking-wide text-mint font-semibold">{label}</p>
-      {bulleted ? (
-        <ul className="mt-2 list-disc list-inside space-y-1 text-body text-sm">
-          {items.map((item, i) => (
-            <li key={i}>{item}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-2 text-body text-sm whitespace-pre-line">{text}</p>
-      )}
+      <ul className="mt-2 list-disc list-inside space-y-1 text-body text-sm">
+        {items.map((item, i) => (
+          <li key={i}>{item}</li>
+        ))}
+      </ul>
     </div>
   )
 }
@@ -225,10 +222,10 @@ export default function CareerRoadmap() {
           <>
             {parseFailed ? (
               <div className="mt-6 space-y-4">
-                <StageCard label="Where you are now" text={result.WHERE_NOW} bulleted={false} />
-                <StageCard label="3 months" text={result.THREE_MONTH} bulleted />
-                <StageCard label="6 months" text={result.SIX_MONTH} bulleted />
-                <StageCard label="1 year" text={result.ONE_YEAR} bulleted />
+                <StageCard label="Where you are now" text={result.WHERE_NOW} />
+                <StageCard label="3 months" text={result.THREE_MONTH} />
+                <StageCard label="6 months" text={result.SIX_MONTH} />
+                <StageCard label="1 year" text={result.ONE_YEAR} />
               </div>
             ) : (
               <div

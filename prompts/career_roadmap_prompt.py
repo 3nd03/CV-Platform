@@ -17,15 +17,17 @@ SKILL GAP ANALYSIS (if available):
 
 Return your response using exactly these section labels, in this order. Do not add extra sections or change the label names. Do not use em dashes anywhere in the response.
 
+Every section is a bullet list only. Do not write an introductory paragraph, summary sentence, or any prose outside the bullets. Each bullet is one short, clear point, maximum 15 words, starting with a hyphen.
+
 WHERE_NOW:
-<2 to 3 sentences on the candidate's current position relative to their target role>
+<bullet list of 3 to 4 short bullets stating the candidate's current position relative to their target role, one fact per bullet>
 
 THREE_MONTH:
-<bullet list of 3 to 5 concrete milestones to reach in the next 3 months>
+<bullet list of 3 to 5 short milestones to reach in the next 3 months, one action or goal per bullet>
 
 SIX_MONTH:
-<bullet list of 3 to 5 concrete milestones to reach in the next 6 months>
+<bullet list of 3 to 5 short milestones to reach in the next 6 months, one action or goal per bullet>
 
 ONE_YEAR:
-<bullet list of 3 to 5 concrete milestones describing where the candidate should be in 1 year>
+<bullet list of 3 to 5 short milestones describing where the candidate should be in 1 year, one action or goal per bullet>
 """

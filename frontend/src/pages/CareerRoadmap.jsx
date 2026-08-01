@@ -20,11 +20,23 @@ const STAGES = [
   { key: 'ONE_YEAR', label: '1 Year', bulleted: true },
 ]
 
-const HEADER_WIDTH = 280
-const MILESTONE_WIDTH = 240
+const HEADER_WIDTH = 200
+const HEADER_MIN_HEIGHT = 48
+const MILESTONE_WIDTH = 280
+// Milestone node height is intrinsic (auto), this is only an estimate used to
+// space rows out vertically so wrapped text has room without nodes overlapping.
+const MILESTONE_HEIGHT_ESTIMATE = 80
 const CENTER_X = 0
-const HEADER_ROW_HEIGHT = 130
-const MILESTONE_ROW_HEIGHT = 110
+const GAP_WITHIN_STAGE = 80
+const GAP_BETWEEN_STAGES = 120
+
+const NODE_CONTENT_STYLE = {
+  overflow: 'visible',
+  whiteSpace: 'normal',
+  wordWrap: 'break-word',
+  overflowWrap: 'break-word',
+  boxSizing: 'border-box',
+}
 
 function bulletLines(text) {
   return (text || '')
@@ -36,11 +48,25 @@ function bulletLines(text) {
 function StageHeaderNode({ data }) {
   return (
     <div
-      className="rounded-xl border-2 border-teal bg-mint px-6 py-4 text-center shadow-card"
-      style={{ width: HEADER_WIDTH }}
+      className="shadow-card"
+      style={{
+        ...NODE_CONTENT_STYLE,
+        width: HEADER_WIDTH,
+        minHeight: HEADER_MIN_HEIGHT,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        backgroundColor: '#abebd9',
+        color: '#1a3a3a',
+        fontWeight: 700,
+        fontSize: 14,
+        borderRadius: 12,
+        padding: '8px 16px',
+      }}
     >
       <Handle type="target" position={Position.Top} />
-      <p className="text-teal font-bold text-lg">{data.label}</p>
+      <span>{data.label}</span>
       <Handle type="source" position={Position.Bottom} />
     </div>
   )
@@ -49,11 +75,21 @@ function StageHeaderNode({ data }) {
 function MilestoneNode({ data }) {
   return (
     <div
-      className="rounded-lg border border-mint-border bg-white px-4 py-3 shadow-card"
-      style={{ width: MILESTONE_WIDTH }}
+      className="shadow-card"
+      style={{
+        ...NODE_CONTENT_STYLE,
+        width: MILESTONE_WIDTH,
+        height: 'auto',
+        backgroundColor: '#ffffff',
+        border: '1px solid #d4f0e8',
+        color: '#1a3a3a',
+        fontSize: 10,
+        borderRadius: 10,
+        padding: 12,
+      }}
     >
       <Handle type="target" position={Position.Top} />
-      <p className="text-teal text-sm">{data.label}</p>
+      <span>{data.label}</span>
       <Handle type="source" position={Position.Bottom} />
     </div>
   )
@@ -91,10 +127,17 @@ function buildGraph(result) {
       })
     }
 
-    y += HEADER_ROW_HEIGHT
-
     const rawText = result?.[stage.key] || ''
     const milestones = stage.bulleted ? bulletLines(rawText) : [rawText.trim()].filter(Boolean)
+
+    if (milestones.length === 0) {
+      // Nothing to fan out to, so the header itself bridges straight to the next stage.
+      y += HEADER_MIN_HEIGHT + GAP_BETWEEN_STAGES
+      bridgeFromId = headerId
+      continue
+    }
+
+    y += HEADER_MIN_HEIGHT + GAP_WITHIN_STAGE
 
     let lastMilestoneId = null
     milestones.forEach((text, i) => {
@@ -113,12 +156,13 @@ function buildGraph(result) {
         type: 'smoothstep',
         style: { stroke: '#abebd9', strokeWidth: 2 },
       })
-      y += MILESTONE_ROW_HEIGHT
+      const isLastInStage = i === milestones.length - 1
+      y += MILESTONE_HEIGHT_ESTIMATE + (isLastInStage ? GAP_BETWEEN_STAGES : GAP_WITHIN_STAGE)
       lastMilestoneId = id
       milestoneCount += 1
     })
 
-    bridgeFromId = lastMilestoneId || headerId
+    bridgeFromId = lastMilestoneId
   }
 
   return { nodes, edges, milestoneCount }
@@ -184,7 +228,7 @@ export default function CareerRoadmap() {
                 <StageCard label="1 year" text={result.ONE_YEAR} bulleted />
               </div>
             ) : (
-              <div className="mt-6 w-full h-[600px] rounded-xl border border-mint-border overflow-hidden">
+              <div className="mt-6 w-full min-h-[800px] mx-auto rounded-xl border border-mint-border overflow-hidden">
                 <ReactFlow
                   nodes={graph.nodes}
                   edges={graph.edges}

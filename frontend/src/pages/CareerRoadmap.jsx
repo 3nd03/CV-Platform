@@ -165,7 +165,7 @@ function buildGraph(result) {
     bridgeFromId = lastMilestoneId
   }
 
-  return { nodes, edges, milestoneCount }
+  return { nodes, edges, milestoneCount, contentHeight: y }
 }
 
 function StageCard({ label, text, bulleted }) {
@@ -192,6 +192,9 @@ export default function CareerRoadmap() {
 
   const graph = useMemo(() => (result ? buildGraph(result) : null), [result])
   const parseFailed = !graph || graph.milestoneCount === 0
+  // React Flow needs a concrete pixel height on its container to render at all,
+  // it collapses to 0 height if only min-height is set on an auto-sized parent.
+  const diagramHeight = graph ? Math.max(800, graph.contentHeight + 100) : 800
 
   async function handleRun() {
     setLoading(true)
@@ -228,7 +231,10 @@ export default function CareerRoadmap() {
                 <StageCard label="1 year" text={result.ONE_YEAR} bulleted />
               </div>
             ) : (
-              <div className="mt-6 w-full min-h-[800px] mx-auto rounded-xl border border-mint-border overflow-hidden">
+              <div
+                className="mt-6 w-full mx-auto rounded-xl border border-mint-border overflow-hidden"
+                style={{ height: diagramHeight }}
+              >
                 <ReactFlow
                   nodes={graph.nodes}
                   edges={graph.edges}

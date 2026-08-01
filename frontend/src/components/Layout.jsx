@@ -14,6 +14,7 @@ export default function Layout({ children }) {
   const location = useLocation()
   const title = PAGE_TITLES[location.pathname] || 'Careerly'
   const onToolPage = TOOL_PATHS.has(location.pathname)
+  const isDashboard = location.pathname === '/dashboard'
 
   const email = localStorage.getItem('email') || ''
   const displayName = localStorage.getItem('display_name') || email.split('@')[0] || 'Account'
@@ -27,21 +28,20 @@ export default function Layout({ children }) {
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="flex items-center justify-between px-8 py-4">
             <nav className="text-sm text-gray-500">
-              <Link to="/dashboard" className="hover:text-teal transition-colors duration-150">
-                Careerly
-              </Link>
-              <span className="mx-2">/</span>
-              <span className="text-teal font-medium">{title}</span>
+              {isDashboard ? (
+                <span className="text-teal font-medium">Careerly</span>
+              ) : (
+                <>
+                  <Link to="/dashboard" className="hover:text-teal transition-colors duration-150">
+                    Careerly
+                  </Link>
+                  <span className="mx-2">/</span>
+                  <span className="text-teal font-medium">{title}</span>
+                </>
+              )}
             </nav>
 
             <div className="flex items-center gap-4">
-              <button
-                type="button"
-                title="Notifications"
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 hover:bg-mint-light hover:text-teal transition-colors duration-150"
-              >
-                🔔
-              </button>
               <span className="w-8 h-8 rounded-full bg-mint text-teal font-bold flex items-center justify-center text-sm">
                 {initial}
               </span>

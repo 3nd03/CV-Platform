@@ -149,17 +149,17 @@ export default function Dashboard() {
 
       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
         {TOOLS.map((tool) => (
-          <Card key={tool.to} className={`border-b-4 ${tool.border}`}>
+          <Card key={tool.to} className={`border-b-4 ${tool.border} h-44`}>
             <button
               type="button"
               onClick={() => navigate(tool.to)}
-              className="text-left w-full"
+              className="text-left w-full h-full flex flex-col"
             >
-              <div className={`w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center ${tool.text} text-base`}>
-                {tool.icon}
+              <div className={`w-9 h-9 shrink-0 rounded-lg bg-gray-50 flex items-center justify-center ${tool.text}`}>
+                <tool.icon size={20} />
               </div>
-              <p className="mt-3 font-bold text-teal text-sm">{tool.name}</p>
-              <span className="mt-2 inline-block text-mint text-sm font-medium">Open &rarr;</span>
+              <p className="mt-3 font-bold text-teal text-sm leading-snug break-words">{tool.name}</p>
+              <span className="mt-auto pt-2 inline-block text-mint text-sm font-medium">Open &rarr;</span>
             </button>
           </Card>
         ))}

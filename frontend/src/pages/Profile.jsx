@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
 import { getProfile, updateProfile, getAllProfiles, activateProfile, renameProfile } from '../api/profile'
@@ -28,6 +28,7 @@ function PlaceholderNote({ message }) {
 
 export default function Profile() {
   const navigate = useNavigate()
+  const location = useLocation()
   const fileInputRef = useRef(null)
   const [avatarPreview, setAvatarPreview] = useState(null)
 
@@ -58,6 +59,12 @@ export default function Profile() {
       if (avatarPreview) URL.revokeObjectURL(avatarPreview)
     }
   }, [avatarPreview])
+
+  useEffect(() => {
+    if (!location.hash) return
+    const target = document.getElementById(location.hash.slice(1))
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [location.hash])
 
   function refreshProfiles() {
     getAllProfiles()
@@ -132,7 +139,7 @@ export default function Profile() {
 
         <Divider />
 
-        <section>
+        <section id="active-profile">
           <h2 className="font-bold text-teal mb-4 text-sm uppercase tracking-wide">Active Profile</h2>
           <form onSubmit={handleSaveProfile} className="space-y-4">
             {Object.entries(PROFILE_LABELS).map(([key, label]) => (
@@ -159,7 +166,7 @@ export default function Profile() {
 
         <Divider />
 
-        <section>
+        <section id="your-profiles">
           <h2 className="font-bold text-teal mb-4 text-sm uppercase tracking-wide">Your Profiles</h2>
           <div className="space-y-3">
             {allProfiles.map((p) => (
@@ -212,7 +219,7 @@ export default function Profile() {
 
         <Divider />
 
-        <section>
+        <section id="history">
           <h2 className="font-bold text-teal mb-4 text-sm uppercase tracking-wide">History</h2>
           <PlaceholderNote message="Past results per tool need a history endpoint that isn't available yet." />
         </section>

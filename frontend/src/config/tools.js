@@ -1,8 +1,22 @@
+import {
+  BarChart2,
+  FileText,
+  Mail,
+  Briefcase,
+  Mic,
+  Download,
+  Map,
+  DollarSign,
+  CheckSquare,
+  Globe,
+} from 'lucide-react'
+import LinkedinIcon from '../icons/LinkedinIcon'
+
 export const TOOLS = [
   {
     to: '/skill-gap',
     doneKey: 'skill_gap',
-    icon: '%',
+    icon: BarChart2,
     name: 'Skill Gap Analysis',
     description: 'See how you match your target role.',
     border: 'border-mint',
@@ -11,7 +25,7 @@ export const TOOLS = [
   {
     to: '/cv-analyser',
     doneKey: 'cv_analyser',
-    icon: '\u{1F4C4}',
+    icon: FileText,
     name: 'CV Analyser',
     description: 'Upload your CV for a structured review.',
     border: 'border-teal',
@@ -20,7 +34,7 @@ export const TOOLS = [
   {
     to: '/cover-letter',
     doneKey: 'cover_letter',
-    icon: '✉',
+    icon: Mail,
     name: 'Cover Letter',
     description: 'Generate a tailored cover letter.',
     border: 'border-purple',
@@ -29,7 +43,7 @@ export const TOOLS = [
   {
     to: '/job-roles',
     doneKey: 'job_roles',
-    icon: '★',
+    icon: Briefcase,
     name: 'Job Role Suggestions',
     description: 'Roles to target now and in six months.',
     border: 'border-gold',
@@ -38,7 +52,7 @@ export const TOOLS = [
   {
     to: '/linkedin-message',
     doneKey: 'linkedin_message',
-    icon: 'in',
+    icon: LinkedinIcon,
     name: 'LinkedIn Message',
     description: 'Draft a cold outreach message.',
     border: 'border-blue-600',
@@ -47,7 +61,7 @@ export const TOOLS = [
   {
     to: '/interview-prep',
     doneKey: 'interview_prep',
-    icon: '?',
+    icon: Mic,
     name: 'Interview Prep',
     description: 'Practice role-specific questions.',
     border: 'border-pink-600',
@@ -56,7 +70,7 @@ export const TOOLS = [
   {
     to: '/cv-download',
     doneKey: 'cv_download',
-    icon: '↓',
+    icon: Download,
     name: 'CV Download',
     description: 'Get an ATS-friendly CV as a PDF.',
     border: 'border-cyan-600',
@@ -65,7 +79,7 @@ export const TOOLS = [
   {
     to: '/career-roadmap',
     doneKey: 'career_roadmap',
-    icon: '→',
+    icon: Map,
     name: 'Career Roadmap',
     description: 'Milestones from now to one year out.',
     border: 'border-orange-600',
@@ -74,7 +88,7 @@ export const TOOLS = [
   {
     to: '/salary-insights',
     doneKey: 'salary_insights',
-    icon: '£',
+    icon: DollarSign,
     name: 'Salary Insights',
     description: 'Ranges and negotiation tips.',
     border: 'border-emerald-600',
@@ -83,7 +97,7 @@ export const TOOLS = [
   {
     to: '/application-tracker',
     doneKey: 'application_tracker',
-    icon: '✓',
+    icon: CheckSquare,
     name: 'Application Tracker',
     description: 'Track every application in one place.',
     border: 'border-indigo-600',
@@ -92,7 +106,7 @@ export const TOOLS = [
   {
     to: '/cv-translator',
     doneKey: 'cv_translator',
-    icon: '\u{1F310}',
+    icon: Globe,
     name: 'CV Translator',
     description: 'Translate your CV into another language.',
     border: 'border-rose-600',

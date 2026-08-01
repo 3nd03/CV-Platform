@@ -23,6 +23,8 @@ const HISTORY_LABELS = {
   salary_insights: 'Salary Insights',
 }
 
+const HISTORY_PREVIEW_LIMIT = 5
+
 function formatHistoryContent(content) {
   if (content && typeof content === 'object') {
     return Object.entries(content)
@@ -31,6 +33,36 @@ function formatHistoryContent(content) {
       .join('\n')
   }
   return content || ''
+}
+
+function historyPreview(content) {
+  const text = formatHistoryContent(content)
+  const firstLine = text.split('\n').find((line) => line.trim()) || 'No details'
+  return firstLine.length > 70 ? `${firstLine.slice(0, 70)}...` : firstLine
+}
+
+function HistoryEntryRow({ entryKey, entry, isOpen, onToggle }) {
+  return (
+    <div className="border-t border-gray-100 first:border-t-0">
+      <button
+        type="button"
+        onClick={() => onToggle(entryKey)}
+        className="w-full flex items-center gap-3 px-2 py-2 text-left rounded-lg hover:bg-mint-light transition-colors duration-150"
+      >
+        <span className="text-xs text-gray-500 shrink-0">{new Date(entry.created_at).toLocaleDateString()}</span>
+        <span className="flex-1 text-body text-sm truncate">{historyPreview(entry.content)}</span>
+        <span className="text-xs text-gray-500 shrink-0">{isOpen ? '▲' : '▼'}</span>
+      </button>
+      {isOpen && (
+        <div className="px-2 pb-3">
+          <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-3">
+            <p className="text-xs text-gray-500 mb-1">{new Date(entry.created_at).toLocaleString()}</p>
+            <p className="text-body text-sm whitespace-pre-line">{formatHistoryContent(entry.content)}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
 
 const PROFILE_LABELS = {
@@ -75,6 +107,8 @@ export default function Profile() {
   const [history, setHistory] = useState(null)
   const [historyError, setHistoryError] = useState('')
   const [openHistoryTools, setOpenHistoryTools] = useState(() => new Set())
+  const [openHistoryEntries, setOpenHistoryEntries] = useState(() => new Set())
+  const [expandedHistoryTools, setExpandedHistoryTools] = useState(() => new Set())
 
   useEffect(() => {
     getProfile()
@@ -92,6 +126,30 @@ export default function Profile() {
 
   function toggleHistoryTool(toolKey) {
     setOpenHistoryTools((prev) => {
+      const next = new Set(prev)
+      if (next.has(toolKey)) {
+        next.delete(toolKey)
+      } else {
+        next.add(toolKey)
+      }
+      return next
+    })
+  }
+
+  function toggleHistoryEntry(entryKey) {
+    setOpenHistoryEntries((prev) => {
+      const next = new Set(prev)
+      if (next.has(entryKey)) {
+        next.delete(entryKey)
+      } else {
+        next.add(entryKey)
+      }
+      return next
+    })
+  }
+
+  function toggleShowAllHistory(toolKey) {
+    setExpandedHistoryTools((prev) => {
       const next = new Set(prev)
       if (next.has(toolKey)) {
         next.delete(toolKey)
@@ -276,6 +334,9 @@ export default function Profile() {
               {Object.entries(HISTORY_LABELS).map(([toolKey, label]) => {
                 const entries = history[toolKey] || []
                 const isOpen = openHistoryTools.has(toolKey)
+                const showAll = expandedHistoryTools.has(toolKey)
+                const visibleEntries = showAll ? entries : entries.slice(0, HISTORY_PREVIEW_LIMIT)
+                const hiddenCount = entries.length - visibleEntries.length
                 return (
                   <div key={toolKey} className="border border-gray-200 rounded-lg overflow-hidden">
                     <button
@@ -289,20 +350,42 @@ export default function Profile() {
                       </span>
                     </button>
                     {isOpen && (
-                      <div className="p-4 space-y-3">
+                      <div className="p-2">
                         {entries.length === 0 ? (
-                          <p className="text-body text-sm">No results yet.</p>
+                          <p className="text-body text-sm p-2">No results yet.</p>
                         ) : (
-                          entries.map((entry, i) => (
-                            <div key={i} className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-3">
-                              <p className="text-xs text-gray-500 mb-1">
-                                {new Date(entry.created_at).toLocaleString()}
-                              </p>
-                              <p className="text-body text-sm whitespace-pre-line">
-                                {formatHistoryContent(entry.content)}
-                              </p>
-                            </div>
-                          ))
+                          <>
+                            {visibleEntries.map((entry, i) => {
+                              const entryKey = `${toolKey}:${i}`
+                              return (
+                                <HistoryEntryRow
+                                  key={entryKey}
+                                  entryKey={entryKey}
+                                  entry={entry}
+                                  isOpen={openHistoryEntries.has(entryKey)}
+                                  onToggle={toggleHistoryEntry}
+                                />
+                              )
+                            })}
+                            {hiddenCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => toggleShowAllHistory(toolKey)}
+                                className="w-full text-center text-xs text-teal py-2 hover:underline"
+                              >
+                                Show {hiddenCount} older
+                              </button>
+                            )}
+                            {showAll && entries.length > HISTORY_PREVIEW_LIMIT && (
+                              <button
+                                type="button"
+                                onClick={() => toggleShowAllHistory(toolKey)}
+                                className="w-full text-center text-xs text-teal py-2 hover:underline"
+                              >
+                                Show fewer
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     )}

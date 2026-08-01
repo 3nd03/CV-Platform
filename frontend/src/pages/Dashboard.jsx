@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Target, BarChart2, CheckSquare, UserCheck, Sparkles, PartyPopper, ArrowRight } from 'lucide-react'
 import Layout from '../components/Layout'
 import Card from '../components/Card'
+import Logo from '../components/Logo'
 import { getProfile } from '../api/profile'
-import { TOOLS } from '../config/tools'
+import { TOOLS, TOOL_CATEGORIES } from '../config/tools'
 import { getToolsUsedCount, isToolUsed } from '../utils/toolActivity'
 
 const PROFILE_FIELD_KEYS = [
@@ -99,6 +100,7 @@ export default function Dashboard() {
   const location = useLocation()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [activeCategory, setActiveCategory] = useState(TOOL_CATEGORIES[0])
 
   useEffect(() => {
     getProfile()
@@ -141,6 +143,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
+      <Logo className="mb-6" />
       <h1 className="text-2xl font-bold" style={{ color: '#1a3a3a' }}>
         {greetingForNow()}{greetingName ? `, ${greetingName}` : ''}
       </h1>
@@ -207,8 +210,26 @@ export default function Dashboard() {
 
       <section id="tools-section" className="scroll-mt-6">
         <SectionHeading badge={TOOLS.length}>Your tools</SectionHeading>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {TOOL_CATEGORIES.map((category) => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => setActiveCategory(category)}
+              className={`px-4 py-2 rounded-[10px] text-sm font-medium transition-colors duration-200 ${
+                activeCategory === category
+                  ? 'bg-mint text-teal'
+                  : 'bg-white border border-card-border text-gray-500 hover:bg-mint-light'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
         <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-          {TOOLS.map((tool) => (
+          {TOOLS.filter((tool) => tool.category === activeCategory).map((tool) => (
             <Card key={tool.to} hoverable className="h-40">
               <button
                 type="button"

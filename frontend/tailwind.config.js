@@ -31,6 +31,7 @@ export default {
       },
       spacing: {
         sidebar: '220px',
+        'sidebar-collapsed': '72px',
       },
     },
   },

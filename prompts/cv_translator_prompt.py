@@ -10,6 +10,7 @@ Rules:
 - Keep a professional, natural tone appropriate for a CV in {target_language}.
 - Do not translate proper nouns such as company names, unless there is a standard translated form.
 - Plain text only. No markdown, no asterisks.
+- Do not use em dashes anywhere in the response.
 
 Return only the translated CV, nothing else.
 """

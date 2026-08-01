@@ -21,4 +21,5 @@ Instructions:
 - Three to four paragraphs. Concise and targeted.
 - Close with a clear call to action.
 - Use UK English spelling throughout.
+- Do not use em dashes anywhere in the response.
 """

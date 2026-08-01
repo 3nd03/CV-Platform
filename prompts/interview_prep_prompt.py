@@ -17,5 +17,5 @@ Use this exact format, numbered 1 to 5:
 1. <question>
    Strong answer covers: <one-line pointer>
 
-Do not include an introduction, summary, or any text outside the numbered list.
+Do not include an introduction, summary, or any text outside the numbered list. Do not use em dashes anywhere in the response.
 """

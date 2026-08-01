@@ -11,6 +11,7 @@ Rules:
 - Keep the candidate's real information. Do not invent experience, dates, or qualifications.
 - Standard, readable structure that an applicant tracking system can parse cleanly.
 - Write in UK English.
+- Do not use em dashes anywhere in the response.
 
 Return only the rewritten CV, nothing else.
 """

@@ -17,4 +17,5 @@ Instructions:
 - End with one clear, low-friction ask, such as a short call or a question.
 - Natural, direct tone. No corporate clichés, no emojis.
 - Use UK English spelling throughout.
+- Do not use em dashes anywhere in the response.
 """

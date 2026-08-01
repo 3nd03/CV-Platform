@@ -9,7 +9,7 @@ CANDIDATE PROFILE:
 - Current skills: {profile.get("current_skills", "Not provided")}
 - Salary expectations: {profile.get("salary", "Not provided")}
 
-Return your response using exactly these section labels, in this order. Do not add extra sections or change the label names.
+Return your response using exactly these section labels, in this order. Do not add extra sections or change the label names. Do not use em dashes anywhere in the response.
 
 RANGE_JUNIOR:
 <typical salary range for a junior-level candidate in this role and location>

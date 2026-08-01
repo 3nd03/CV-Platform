@@ -15,7 +15,7 @@ SKILL GAP ANALYSIS (if available):
 - Missing skills: {skill_gap_result.get("MISSING_SKILLS", "Not available")}
 - Next steps: {skill_gap_result.get("NEXT_STEPS", "Not available")}
 
-Return your response using exactly these section labels, in this order. Do not add extra sections or change the label names.
+Return your response using exactly these section labels, in this order. Do not add extra sections or change the label names. Do not use em dashes anywhere in the response.
 
 WHERE_NOW:
 <2 to 3 sentences on the candidate's current position relative to their target role>

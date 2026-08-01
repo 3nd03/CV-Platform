@@ -12,6 +12,8 @@ Use exactly these keys: target_role, current_skills, background, experience, too
 
 If a value cannot be determined from the CV, use an empty string for that key.
 
+Do not use em dashes anywhere in the extracted values.
+
 CV CONTENT:
 {cv_text}
 """

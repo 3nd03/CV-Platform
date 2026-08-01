@@ -10,7 +10,7 @@ CANDIDATE PROFILE:
 - Open to learning: {profile.get("open_to_learning", "Not provided")}
 - Self-identified gaps: {profile.get("self_gaps", "Not provided")}
 
-Return your response using exactly these section labels, in this order. Do not add extra sections or change the label names.
+Return your response using exactly these section labels, in this order. Do not add extra sections or change the label names. Do not use em dashes anywhere in the response.
 
 MATCH_SCORE: <a single percentage, e.g. 72%>
 

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
+import Card from '../components/Card'
 import FollowUpChat from '../components/FollowUpChat'
 import { runInterviewPrep } from '../api/tools'
+import { markToolUsed } from '../utils/toolActivity'
 
 function parseQuestions(text) {
   if (!text) return []
@@ -28,6 +30,7 @@ export default function InterviewPrep() {
     try {
       const { result: text } = await runInterviewPrep()
       setResult(text)
+      markToolUsed('interview_prep')
     } finally {
       setLoading(false)
     }
@@ -37,42 +40,43 @@ export default function InterviewPrep() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold text-teal mb-6">Interview Prep</h1>
+      <Card>
+        <h1 className="text-xl font-bold text-teal mb-6">Interview Prep</h1>
 
-      {!skillGapDone && (
-        <div className="bg-mint-light border border-mint-border rounded-xl p-4 mb-4 text-body text-sm">
-          Tip: run the Skill Gap Analysis first for questions targeted at your weaker areas.
-        </div>
-      )}
+        {!skillGapDone && (
+          <div className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4 mb-4 text-body text-sm">
+            Tip: run the Skill Gap Analysis first for questions targeted at your weaker areas.
+          </div>
+        )}
 
-      <button
-        type="button"
-        onClick={handleGenerate}
-        disabled={loading}
-        className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50"
-      >
-        {loading ? 'Preparing...' : 'Generate questions'}
-      </button>
+        <button
+          type="button"
+          onClick={handleGenerate}
+          disabled={loading}
+          className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50 transition-colors duration-150"
+        >
+          {loading ? 'Preparing...' : 'Generate questions'}
+        </button>
 
-      {questions.length > 0 && (
-        <div className="mt-8 space-y-4">
-          {questions.map((q, i) => (
-            <div
-              key={i}
-              className="bg-mint-light border border-mint-border rounded-xl p-4 flex gap-4 items-start"
-            >
-              <span className="w-7 h-7 shrink-0 rounded-full bg-mint text-teal font-bold flex items-center justify-center text-sm">
-                {i + 1}
-              </span>
-              <div>
-                <p className="font-bold text-teal">{q.question}</p>
-                {q.guidance && <p className="text-body text-sm mt-1">{q.guidance}</p>}
-              </div>
+        {questions.length > 0 && (
+          <>
+            <div className="mt-6 space-y-3">
+              {questions.map((q, i) => (
+                <div key={i} className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4 flex gap-3 items-start">
+                  <span className="w-6 h-6 shrink-0 rounded-full bg-mint text-teal font-bold flex items-center justify-center text-xs">
+                    {i + 1}
+                  </span>
+                  <div>
+                    <p className="font-bold text-teal text-sm">{q.question}</p>
+                    {q.guidance && <p className="text-body text-sm mt-1">{q.guidance}</p>}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-          <FollowUpChat toolName="interview_prep" result={result} />
-        </div>
-      )}
+            <FollowUpChat toolName="interview_prep" result={result} />
+          </>
+        )}
+      </Card>
     </Layout>
   )
 }

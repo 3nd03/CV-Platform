@@ -1,23 +1,46 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
-import ProfileSummary from '../components/ProfileSummary'
-import ToolCard from '../components/ToolCard'
+import Card from '../components/Card'
 import { getProfile } from '../api/profile'
+import { TOOLS } from '../config/tools'
+import { getToolsUsedCount } from '../utils/toolActivity'
 
-const TOOLS = [
-  { to: '/skill-gap', icon: '%', name: 'Skill Gap Analysis', description: 'See how you match your target role.' },
-  { to: '/cv-analyser', icon: '\u{1F4C4}', name: 'CV Analyser', description: 'Upload your CV for a structured review.' },
-  { to: '/cover-letter', icon: '✉', name: 'Cover Letter', description: 'Generate a tailored cover letter.' },
-  { to: '/job-roles', icon: '★', name: 'Job Role Suggestions', description: 'Roles to target now and in six months.' },
-  { to: '/linkedin-message', icon: 'in', name: 'LinkedIn Message', description: 'Draft a cold outreach message.' },
-  { to: '/interview-prep', icon: '?', name: 'Interview Prep', description: 'Practice role-specific questions.' },
-  { to: '/cv-download', icon: '↓', name: 'CV Download', description: 'Get an ATS-friendly CV as a PDF.' },
-  { to: '/career-roadmap', icon: '→', name: 'Career Roadmap', description: 'Milestones from now to one year out.' },
-  { to: '/salary-insights', icon: '£', name: 'Salary Insights', description: 'Ranges and negotiation tips.' },
-  { to: '/application-tracker', icon: '✓', name: 'Application Tracker', description: 'Track every application in one place.' },
-  { to: '/cv-translator', icon: '\u{1F310}', name: 'CV Translator', description: 'Translate your CV into another language.' },
+const PROFILE_FIELD_KEYS = [
+  'target_role',
+  'current_skills',
+  'background',
+  'experience',
+  'tools',
+  'location',
+  'salary',
+  'open_to_learning',
+  'timeline',
+  'self_gaps',
+  'access_needs',
 ]
+
+function greetingForNow() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 18) return 'Good afternoon'
+  return 'Good evening'
+}
+
+function MetricCard({ border, bar, label, value, subtext, pct }) {
+  return (
+    <div className={`bg-white rounded-xl shadow-card border-t-4 ${border} overflow-hidden`}>
+      <div className="p-5">
+        <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">{label}</p>
+        <p className="text-2xl font-bold text-teal mt-2">{value}</p>
+        {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
+      </div>
+      <div className="h-1.5 bg-gray-100">
+        <div className={`h-full ${bar} transition-all duration-150`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -46,26 +69,99 @@ export default function Dashboard() {
     )
   }
 
+  const data = profile?.data || {}
+  const filledCount = PROFILE_FIELD_KEYS.filter((key) => data[key]).length
+  const profilePct = Math.round((filledCount / PROFILE_FIELD_KEYS.length) * 100)
+  const profileIncomplete = filledCount < PROFILE_FIELD_KEYS.length
+
+  const skillGapScore = sessionStorage.getItem('skill_gap_score')
+  const skillGapPct = skillGapScore ? parseInt(skillGapScore, 10) || 0 : 0
+
+  const toolsUsed = getToolsUsedCount()
+  const toolsUsedPct = Math.round((toolsUsed / TOOLS.length) * 100)
+
   return (
     <Layout>
       <h1 className="text-2xl font-bold text-teal">
-        Welcome back{greetingName ? `, ${greetingName}` : ''}
+        {greetingForNow()}{greetingName ? `, ${greetingName}` : ''}
       </h1>
+      <p className="text-gray-500 mt-1">Here's your career overview</p>
 
-      {profile && (
-        <div className="mt-6">
-          <ProfileSummary profile={profile.data} />
+      {profileIncomplete && (
+        <div className="mt-6 bg-mint-light border border-mint rounded-xl p-4 flex items-center gap-4">
+          <span className="w-10 h-10 shrink-0 rounded-full bg-mint flex items-center justify-center text-teal text-lg">
+            !
+          </span>
+          <p className="flex-1 text-body text-sm">
+            Your profile is {profilePct}% complete. Fill in the rest to get sharper results from every tool.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/profile')}
+            className="shrink-0 bg-mint text-teal rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150"
+          >
+            Complete profile
+          </button>
         </div>
       )}
 
-      <div className="mt-8 bg-mint-light border border-mint-border rounded-xl p-6 text-center">
-        <p className="text-body text-sm">Run the Skill Gap Analysis to see your match score here.</p>
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          border="border-mint"
+          bar="bg-mint"
+          label="Skill Gap Score"
+          value={skillGapScore || 'N/A'}
+          subtext={skillGapScore ? 'From your last analysis' : 'Not run yet'}
+          pct={skillGapPct}
+        />
+        <MetricCard
+          border="border-teal"
+          bar="bg-teal"
+          label="Target Role"
+          value={data.target_role || 'Not set'}
+          subtext={data.target_role ? 'Current focus' : 'Set this in onboarding'}
+          pct={data.target_role ? 100 : 0}
+        />
+        <MetricCard
+          border="border-purple"
+          bar="bg-purple"
+          label="Tools Used"
+          value={`${toolsUsed} / ${TOOLS.length}`}
+          subtext="This session"
+          pct={toolsUsedPct}
+        />
+        <MetricCard
+          border="border-gold"
+          bar="bg-gold"
+          label="Profile Complete"
+          value={`${profilePct}%`}
+          subtext={`${filledCount} of ${PROFILE_FIELD_KEYS.length} fields`}
+          pct={profilePct}
+        />
       </div>
 
-      <h2 className="text-lg font-bold text-teal mt-10 mb-4">Tools</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="mt-10 flex items-center gap-2">
+        <h2 className="text-lg font-bold text-teal">Your tools</h2>
+        <span className="bg-mint-light text-teal text-xs font-semibold px-2 py-0.5 rounded-full">
+          {TOOLS.length}
+        </span>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
         {TOOLS.map((tool) => (
-          <ToolCard key={tool.to} {...tool} />
+          <Card key={tool.to} className={`border-b-4 ${tool.border}`}>
+            <button
+              type="button"
+              onClick={() => navigate(tool.to)}
+              className="text-left w-full"
+            >
+              <div className={`w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center ${tool.text} text-base`}>
+                {tool.icon}
+              </div>
+              <p className="mt-3 font-bold text-teal text-sm">{tool.name}</p>
+              <span className="mt-2 inline-block text-mint text-sm font-medium">Open &rarr;</span>
+            </button>
+          </Card>
         ))}
       </div>
     </Layout>

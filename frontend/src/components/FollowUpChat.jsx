@@ -22,19 +22,15 @@ export default function FollowUpChat({ toolName, result }) {
   }
 
   return (
-    <div className="mt-10 pt-8 border-t border-mint-border">
-      <h3 className="font-bold text-teal mb-4">Ask a follow-up question</h3>
+    <div className="mt-6 pt-6 border-t border-gray-100">
+      <h3 className="font-bold text-teal mb-4 text-sm">Ask a follow-up question</h3>
 
       {history.length > 0 && (
-        <div className="space-y-4 mb-4">
+        <div className="space-y-2 mb-4">
           {history.map((entry, i) => (
             <div key={i} className="space-y-2">
-              <div className="bg-mint-light border border-mint-border rounded-xl p-4 text-body">
-                {entry.question}
-              </div>
-              <div className="bg-white border border-mint-border rounded-xl p-4 text-body">
-                {entry.answer}
-              </div>
+              <div className="bg-mint-light rounded-lg p-3 text-body text-sm">{entry.question}</div>
+              <div className="bg-gray-50 rounded-lg p-3 text-body text-sm">{entry.answer}</div>
             </div>
           ))}
         </div>
@@ -47,13 +43,13 @@ export default function FollowUpChat({ toolName, result }) {
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask about this result..."
-          className="flex-1 bg-mint-light border border-mint-border rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint"
+          className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-body focus:outline-none focus:border-mint transition-colors duration-150"
         />
         <button
           type="button"
           onClick={handleSend}
           disabled={loading}
-          className="bg-mint text-teal rounded-lg px-6 py-2 font-medium disabled:opacity-50"
+          className="bg-mint text-teal rounded-lg px-6 py-2 font-medium disabled:opacity-50 transition-colors duration-150"
         >
           {loading ? 'Sending...' : 'Send'}
         </button>

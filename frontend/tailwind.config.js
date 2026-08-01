@@ -13,6 +13,20 @@ export default {
         teal: '#1a3a3a',
         body: '#4a5568',
         label: '#6b7c6b',
+        purple: '#7c3aed',
+        gold: '#d97706',
+      },
+      boxShadow: {
+        card: '0 1px 3px rgba(0,0,0,0.08)',
+      },
+      transitionDuration: {
+        DEFAULT: '150ms',
+      },
+      maxWidth: {
+        content: '900px',
+      },
+      spacing: {
+        sidebar: '220px',
       },
     },
   },

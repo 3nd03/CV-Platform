@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
+import Card from '../components/Card'
 import FollowUpChat from '../components/FollowUpChat'
 import { runCvAnalyse } from '../api/tools'
+import { markToolUsed } from '../utils/toolActivity'
 
 const SECTIONS = ['Overall Impression', 'What Works Well', 'Weaknesses and Gaps', 'Specific Improvements']
 
@@ -41,6 +43,7 @@ export default function CvAnalyser() {
     try {
       const { result: text } = await runCvAnalyse(file)
       setResult(text)
+      markToolUsed('cv_analyser')
     } catch {
       setError('Could not analyse the CV. Try again.')
     } finally {
@@ -52,43 +55,45 @@ export default function CvAnalyser() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold text-teal mb-6">CV Analyser</h1>
+      <Card>
+        <h1 className="text-xl font-bold text-teal mb-6">CV Analyser</h1>
 
-      <label className="block border-2 border-dashed border-mint-border bg-mint-light rounded-xl p-8 text-center cursor-pointer">
-        <span className="text-3xl block mb-2">&#8593;</span>
-        <span className="text-body text-sm">
-          {file ? file.name : 'Upload your CV (PDF)'}
-        </span>
-        <input
-          type="file"
-          accept="application/pdf"
-          className="hidden"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
-        />
-      </label>
+        <label className="block border-2 border-dashed border-mint-border bg-mint-light rounded-xl p-8 text-center cursor-pointer">
+          <span className="text-3xl block mb-2">&#8593;</span>
+          <span className="text-body text-sm">{file ? file.name : 'Upload your CV (PDF)'}</span>
+          <input
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+          />
+        </label>
 
-      <button
-        type="button"
-        onClick={handleAnalyse}
-        disabled={loading}
-        className="w-full bg-mint text-teal rounded-lg py-3 font-medium mt-4 disabled:opacity-50"
-      >
-        {loading ? 'Analysing...' : 'Analyse CV'}
-      </button>
+        <button
+          type="button"
+          onClick={handleAnalyse}
+          disabled={loading}
+          className="w-full bg-mint text-teal rounded-lg py-3 font-medium mt-4 disabled:opacity-50 transition-colors duration-150"
+        >
+          {loading ? 'Analysing...' : 'Analyse CV'}
+        </button>
 
-      {error && <p className="text-sm text-red-600 mt-4">{error}</p>}
+        {error && <p className="text-sm text-red-600 mt-4">{error}</p>}
 
-      {sections && (
-        <div className="mt-8 space-y-4">
-          {SECTIONS.map((title) => (
-            <div key={title} className="bg-mint-light border border-mint-border rounded-xl p-6">
-              <h3 className="font-bold text-teal mb-2">{title}</h3>
-              <p className="text-body whitespace-pre-line">{sections[title] || 'No data returned.'}</p>
+        {sections && (
+          <>
+            <div className="mt-6 space-y-4">
+              {SECTIONS.map((title) => (
+                <div key={title} className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-4">
+                  <h3 className="font-bold text-teal mb-1 text-sm">{title}</h3>
+                  <p className="text-body text-sm whitespace-pre-line">{sections[title] || 'No data returned.'}</p>
+                </div>
+              ))}
             </div>
-          ))}
-          <FollowUpChat toolName="cv_analyser" result={result} />
-        </div>
-      )}
+            <FollowUpChat toolName="cv_analyser" result={result} />
+          </>
+        )}
+      </Card>
     </Layout>
   )
 }

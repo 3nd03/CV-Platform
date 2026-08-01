@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
+import Card from '../components/Card'
 import FollowUpChat from '../components/FollowUpChat'
 import { runJobRoles } from '../api/tools'
+import { markToolUsed } from '../utils/toolActivity'
 
 function parseNumberedItems(text) {
   if (!text) return []
@@ -12,17 +14,14 @@ function parseNumberedItems(text) {
 function RoleList({ title, items }) {
   return (
     <div>
-      <h2 className="text-lg font-bold text-teal mb-4">{title}</h2>
-      <div className="space-y-3">
+      <h2 className="font-bold text-teal mb-3 text-sm">{title}</h2>
+      <div className="space-y-2">
         {items.map((item, i) => (
-          <div
-            key={i}
-            className="bg-mint-light border border-mint-border rounded-xl p-4 flex gap-4 items-start"
-          >
-            <span className="w-7 h-7 shrink-0 rounded-full bg-mint text-teal font-bold flex items-center justify-center text-sm">
+          <div key={i} className="border-l-4 border-mint bg-gray-50 rounded-r-lg p-3 flex gap-3 items-start">
+            <span className="w-6 h-6 shrink-0 rounded-full bg-mint text-teal font-bold flex items-center justify-center text-xs">
               {i + 1}
             </span>
-            <p className="text-body whitespace-pre-line">{item}</p>
+            <p className="text-body text-sm whitespace-pre-line">{item}</p>
           </div>
         ))}
       </div>
@@ -41,6 +40,7 @@ export default function JobRoles() {
     try {
       const data = await runJobRoles()
       setResult(data)
+      markToolUsed('job_roles')
     } catch {
       setError('Could not get role suggestions. Try again.')
     } finally {
@@ -50,26 +50,30 @@ export default function JobRoles() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold text-teal mb-6">Job Role Suggestions</h1>
+      <Card>
+        <h1 className="text-xl font-bold text-teal mb-6">Job Role Suggestions</h1>
 
-      <button
-        type="button"
-        onClick={handleRun}
-        disabled={loading}
-        className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50"
-      >
-        {loading ? 'Matching roles...' : 'Suggest roles'}
-      </button>
+        <button
+          type="button"
+          onClick={handleRun}
+          disabled={loading}
+          className="w-full bg-mint text-teal rounded-lg py-3 font-medium disabled:opacity-50 transition-colors duration-150"
+        >
+          {loading ? 'Matching roles...' : 'Suggest roles'}
+        </button>
 
-      {error && <p className="text-sm text-red-600 mt-4">{error}</p>}
+        {error && <p className="text-sm text-red-600 mt-4">{error}</p>}
 
-      {result && (
-        <div className="mt-8 space-y-8">
-          <RoleList title="Target Now" items={parseNumberedItems(result.CURRENT_ROLES)} />
-          <RoleList title="Target in Six Months" items={parseNumberedItems(result.FUTURE_ROLES)} />
-          <FollowUpChat toolName="job_roles" result={result} />
-        </div>
-      )}
+        {result && (
+          <>
+            <div className="mt-6 space-y-6">
+              <RoleList title="Target Now" items={parseNumberedItems(result.CURRENT_ROLES)} />
+              <RoleList title="Target in Six Months" items={parseNumberedItems(result.FUTURE_ROLES)} />
+            </div>
+            <FollowUpChat toolName="job_roles" result={result} />
+          </>
+        )}
+      </Card>
     </Layout>
   )
 }

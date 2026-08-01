@@ -1,4 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import io
+import json
+import re
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from database.db_client import (
     create_profile,
@@ -8,16 +12,48 @@ from database.db_client import (
     update_profile,
     update_profile_label,
 )
-from api.schemas import ProfileCreate, ProfileUpdate, ProfileOut, ProfileLabelUpdate
+from services.claude_client import call_claude
+from utils.pdf import extract_pdf_text
+from prompts.profile_extraction_prompt import build_profile_extraction_prompt
+from api.schemas import ProfileCreate, ProfileUpdate, ProfileOut, ProfileLabelUpdate, CVPrefillResponse
 from api.dependencies import get_current_user, get_current_profile
 
 router = APIRouter(prefix="/profile", tags=["profile"])
+
+CV_EXTRACTABLE_KEYS = ["target_role", "current_skills", "background", "experience", "tools", "location"]
 
 
 def _ensure_owns_profile(user_id: int, profile_id: int) -> None:
     profiles = get_profiles_for_user(user_id)
     if not any(p["id"] == profile_id for p in profiles):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
+
+def _parse_extracted(raw: str) -> dict:
+    cleaned = re.sub(r"^```(json)?|```$", "", raw.strip(), flags=re.MULTILINE).strip()
+    try:
+        parsed = json.loads(cleaned)
+    except json.JSONDecodeError:
+        return {}
+    if not isinstance(parsed, dict):
+        return {}
+    return {key: str(parsed.get(key) or "") for key in CV_EXTRACTABLE_KEYS}
+
+
+@router.post("/cv-prefill", response_model=CVPrefillResponse)
+async def cv_prefill(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    file_bytes = await file.read()
+    try:
+        cv_text = extract_pdf_text(io.BytesIO(file_bytes)).strip()
+    except Exception:
+        return CVPrefillResponse()
+
+    if not cv_text:
+        return CVPrefillResponse()
+
+    prompt = build_profile_extraction_prompt(cv_text)
+    raw = call_claude(prompt)
+    return CVPrefillResponse(**_parse_extracted(raw))
 
 
 @router.post("", response_model=ProfileOut)

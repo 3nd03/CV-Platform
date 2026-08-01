@@ -29,3 +29,12 @@ export async function renameProfile(profileId, label) {
   const { data } = await client.put(`/profile/${profileId}/label`, { label })
   return data
 }
+
+export async function cvPrefill(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await client.post('/profile/cv-prefill', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}

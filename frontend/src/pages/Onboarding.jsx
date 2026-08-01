@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createProfile } from '../api/profile'
+import { createProfile, cvPrefill } from '../api/profile'
 
 const QUESTIONS = [
   ['target_role', 'What role are you targeting?'],
@@ -15,6 +15,8 @@ const QUESTIONS = [
   ['self_gaps', 'What do you feel are your biggest gaps for the role you are targeting?'],
   ['access_needs', 'Do you have any disabilities or access needs we should be aware of?'],
 ]
+
+const CV_EXTRACTABLE_KEYS = new Set(QUESTIONS.slice(0, 6).map(([key]) => key))
 
 function ProgressBar({ pct }) {
   return (
@@ -34,6 +36,8 @@ export default function Onboarding() {
   const navigate = useNavigate()
   const [stage, setStage] = useState('upload')
   const [cvFile, setCvFile] = useState(null)
+  const [extracting, setExtracting] = useState(false)
+  const [prefillNotice, setPrefillNotice] = useState('')
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
   const [current, setCurrent] = useState('')
@@ -41,6 +45,34 @@ export default function Onboarding() {
   const [submitting, setSubmitting] = useState(false)
 
   const [key, question] = QUESTIONS[step]
+
+  useEffect(() => {
+    // Only re-syncs on step change, not on every keystroke or answers update mid-step.
+    setCurrent(answers[QUESTIONS[step][0]] || '')
+  }, [step])
+
+  async function handleContinueFromUpload() {
+    if (!cvFile) {
+      setStage('questions')
+      return
+    }
+    setExtracting(true)
+    try {
+      const extracted = await cvPrefill(cvFile)
+      const filled = Object.fromEntries(
+        Object.entries(extracted || {}).filter(([, value]) => (value || '').trim())
+      )
+      if (Object.keys(filled).length > 0) {
+        setAnswers((prev) => ({ ...prev, ...filled }))
+        setPrefillNotice("We've pre-filled what we could find from your CV. Check it over and adjust anything that's wrong.")
+      }
+    } catch {
+      // CV extraction is a convenience only, never blocks onboarding
+    } finally {
+      setExtracting(false)
+      setStage('questions')
+    }
+  }
 
   async function finish(finalAnswers) {
     setSubmitting(true)
@@ -70,7 +102,6 @@ export default function Onboarding() {
   function advance(value) {
     const updated = { ...answers, [key]: value }
     setAnswers(updated)
-    setCurrent('')
     if (step + 1 >= QUESTIONS.length) {
       finish(updated)
     } else {
@@ -93,8 +124,7 @@ export default function Onboarding() {
             <p className="text-xs uppercase tracking-wide text-mint font-semibold">Speed things up</p>
             <h2 className="text-lg font-bold text-teal mt-2">Upload your CV</h2>
             <p className="text-body text-sm mt-1">
-              Automatic pre-fill from your CV isn't available yet, but you can still upload it here to keep on
-              file. You'll answer the questions below either way.
+              Upload your CV and we'll pre-fill what we can, so you only have to answer what's left.
             </p>
 
             <label className="mt-4 block border-2 border-dashed border-mint-border bg-mint-light rounded-xl p-8 text-center cursor-pointer">
@@ -104,6 +134,7 @@ export default function Onboarding() {
                 type="file"
                 accept="application/pdf"
                 className="hidden"
+                disabled={extracting}
                 onChange={(e) => setCvFile(e.target.files?.[0] || null)}
               />
             </label>
@@ -111,15 +142,17 @@ export default function Onboarding() {
             <div className="mt-4 flex gap-3">
               <button
                 type="button"
-                onClick={() => setStage('questions')}
-                className="flex-1 bg-mint text-teal rounded-lg py-2.5 font-medium transition-colors duration-150"
+                onClick={handleContinueFromUpload}
+                disabled={extracting}
+                className="flex-1 bg-mint text-teal rounded-lg py-2.5 font-medium disabled:opacity-50 transition-colors duration-150"
               >
-                Continue
+                {extracting ? 'Reading your CV...' : 'Continue'}
               </button>
               <button
                 type="button"
                 onClick={() => setStage('questions')}
-                className="flex-1 border border-mint-border text-teal bg-white rounded-lg py-2.5 font-medium transition-colors duration-150"
+                disabled={extracting}
+                className="flex-1 border border-mint-border text-teal bg-white rounded-lg py-2.5 font-medium disabled:opacity-50 transition-colors duration-150"
               >
                 Skip
               </button>
@@ -142,6 +175,10 @@ export default function Onboarding() {
             Question {step + 1} of {QUESTIONS.length}
           </p>
           <h2 className="text-lg font-bold text-teal mt-2">{question}</h2>
+
+          {prefillNotice && CV_EXTRACTABLE_KEYS.has(key) && (
+            <p className="text-xs text-gray-500 mt-2">{prefillNotice}</p>
+          )}
 
           {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
 

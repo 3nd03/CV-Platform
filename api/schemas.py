@@ -70,6 +70,15 @@ class ProfileLabelUpdate(BaseModel):
     label: str
 
 
+class CVPrefillResponse(BaseModel):
+    target_role: str = ""
+    current_skills: str = ""
+    background: str = ""
+    experience: str = ""
+    tools: str = ""
+    location: str = ""
+
+
 class CoverLetterRequest(BaseModel):
     job_description: str
 

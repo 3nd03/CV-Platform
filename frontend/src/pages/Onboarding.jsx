@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createProfile, cvPrefill } from '../api/profile'
+import { createProfile, cvPrefill, getProfile } from '../api/profile'
+import BackButton from '../components/BackButton'
 
 const QUESTIONS = [
   ['target_role', 'What role are you targeting?'],
@@ -44,8 +45,15 @@ export default function Onboarding() {
   const [current, setCurrent] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [hasExistingProfile, setHasExistingProfile] = useState(false)
 
   const [key, question] = QUESTIONS[step]
+
+  useEffect(() => {
+    getProfile()
+      .then(() => setHasExistingProfile(true))
+      .catch(() => setHasExistingProfile(false))
+  }, [])
 
   useEffect(() => {
     // Only re-syncs on step change, not on every keystroke or answers update mid-step.
@@ -122,6 +130,7 @@ export default function Onboarding() {
     return (
       <div className="min-h-screen bg-gray-50 px-4 py-10">
         <div className="max-w-[720px] mx-auto">
+          {hasExistingProfile && <BackButton />}
           <QuestionCard>
             <p className="text-xs uppercase tracking-wide text-mint font-semibold">Speed things up</p>
             <h2 className="text-lg font-bold text-teal mt-2">Upload your CV</h2>
@@ -171,6 +180,7 @@ export default function Onboarding() {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-10">
       <div className="max-w-[720px] mx-auto">
+        {hasExistingProfile && <BackButton />}
         <ProgressBar pct={progressPct} />
 
         <QuestionCard>

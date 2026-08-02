@@ -82,17 +82,24 @@ function Divider() {
   return <div className="border-t border-gray-100 my-8" />
 }
 
-function MetricCard({ icon: Icon, label, value, subtext, className = '', compact = false }) {
+function MetricCard({ icon: Icon, label, value, subtext, className = '', size = 'lg' }) {
+  const isSm = size === 'sm'
   return (
     <Card className={className}>
       <div
-        className={`${compact ? 'w-7 h-7' : 'w-10 h-10'} rounded-full bg-mint-light flex items-center justify-center text-teal`}
+        className={`${isSm ? 'w-[17.5px] h-[17.5px]' : 'w-[25px] h-[25px]'} rounded-full bg-mint-light flex items-center justify-center text-teal`}
       >
-        <Icon size={compact ? 14 : 20} />
+        <Icon size={isSm ? 8.75 : 12.5} />
       </div>
-      <p className={`font-bold text-teal ${compact ? 'text-base mt-1.5' : 'text-2xl mt-3'}`}>{value}</p>
-      <p className="text-xs text-gray-500 mt-1">{label}</p>
-      {subtext && <p className="text-xs text-gray-400 mt-0.5">{subtext}</p>}
+      <p
+        className={`font-bold text-teal ${
+          isSm ? 'text-[10px] leading-[15px] mt-[3.75px]' : 'text-[15px] leading-[20px] mt-[7.5px]'
+        }`}
+      >
+        {value}
+      </p>
+      <p className="text-[7.5px] leading-[10px] text-gray-500 mt-[2.5px]">{label}</p>
+      {subtext && <p className="text-[7.5px] leading-[10px] text-gray-400 mt-[1.25px]">{subtext}</p>}
     </Card>
   )
 }
@@ -189,15 +196,15 @@ export default function Dashboard() {
         <SectionHeading>Your progress</SectionHeading>
         <div className="mt-4 grid grid-cols-2 gap-4">
           <MetricCard
-            className="col-span-2"
+            className="col-span-2 !p-[15px]"
             icon={Target}
             label="Target Role"
             value={data.target_role || 'Not set'}
             subtext={data.target_role ? 'Current focus' : 'Set this in onboarding'}
           />
           <MetricCard
-            compact
-            className="col-span-2 !p-3"
+            size="sm"
+            className="col-span-2 !p-[7.5px]"
             icon={BarChart2}
             label="Skill Gap Score"
             value={skillGapScore || 'N/A'}
@@ -208,16 +215,16 @@ export default function Dashboard() {
             }
           />
           <MetricCard
-            compact
-            className="col-span-1 !p-3"
+            size="sm"
+            className="col-span-1 !p-[7.5px]"
             icon={CheckSquare}
             label="Tools Used"
             value={`${toolsUsed.count} / ${toolsUsed.total}`}
             subtext="All time"
           />
           <MetricCard
-            compact
-            className="col-span-1 !p-3"
+            size="sm"
+            className="col-span-1 !p-[7.5px]"
             icon={UserCheck}
             label="Profile Complete"
             value={`${profilePct}%`}

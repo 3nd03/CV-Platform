@@ -82,13 +82,15 @@ function Divider() {
   return <div className="border-t border-gray-100 my-8" />
 }
 
-function MetricCard({ icon: Icon, label, value, subtext, className = '' }) {
+function MetricCard({ icon: Icon, label, value, subtext, className = '', compact = false }) {
   return (
     <Card className={className}>
-      <div className="w-10 h-10 rounded-full bg-mint-light flex items-center justify-center text-teal">
-        <Icon size={20} />
+      <div
+        className={`${compact ? 'w-7 h-7' : 'w-10 h-10'} rounded-full bg-mint-light flex items-center justify-center text-teal`}
+      >
+        <Icon size={compact ? 14 : 20} />
       </div>
-      <p className="text-2xl font-bold text-teal mt-3">{value}</p>
+      <p className={`font-bold text-teal ${compact ? 'text-base mt-1.5' : 'text-2xl mt-3'}`}>{value}</p>
       <p className="text-xs text-gray-500 mt-1">{label}</p>
       {subtext && <p className="text-xs text-gray-400 mt-0.5">{subtext}</p>}
     </Card>
@@ -205,14 +207,16 @@ export default function Dashboard() {
             }
           />
           <MetricCard
-            className="col-span-1 min-h-[40px]"
+            compact
+            className="col-span-1 !p-3 min-h-[40px]"
             icon={CheckSquare}
             label="Tools Used"
             value={`${toolsUsed.count} / ${toolsUsed.total}`}
             subtext="All time"
           />
           <MetricCard
-            className="col-span-1 min-h-[40px]"
+            compact
+            className="col-span-1 !p-3 min-h-[40px]"
             icon={UserCheck}
             label="Profile Complete"
             value={`${profilePct}%`}

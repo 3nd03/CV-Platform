@@ -189,7 +189,7 @@ export default function Dashboard() {
         <SectionHeading>Your progress</SectionHeading>
         <div className="mt-4 grid grid-cols-2 gap-4">
           <MetricCard
-            className="col-span-2 min-h-[100px]"
+            className="col-span-2"
             icon={Target}
             label="Target Role"
             value={data.target_role || 'Not set'}
@@ -197,7 +197,7 @@ export default function Dashboard() {
           />
           <MetricCard
             compact
-            className="col-span-2 !p-3 min-h-[80px]"
+            className="col-span-2 !p-3"
             icon={BarChart2}
             label="Skill Gap Score"
             value={skillGapScore || 'N/A'}
@@ -209,7 +209,7 @@ export default function Dashboard() {
           />
           <MetricCard
             compact
-            className="col-span-1 !p-3 min-h-[40px]"
+            className="col-span-1 !p-3"
             icon={CheckSquare}
             label="Tools Used"
             value={`${toolsUsed.count} / ${toolsUsed.total}`}
@@ -217,7 +217,7 @@ export default function Dashboard() {
           />
           <MetricCard
             compact
-            className="col-span-1 !p-3 min-h-[40px]"
+            className="col-span-1 !p-3"
             icon={UserCheck}
             label="Profile Complete"
             value={`${profilePct}%`}

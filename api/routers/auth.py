@@ -3,8 +3,8 @@ from fastapi.security import HTTPAuthorizationCredentials
 
 from database.db_client import create_user, get_user_by_email, create_remember_token, delete_remember_token
 from services.auth_service import hash_password, verify_password
-from api.schemas import SignupRequest, LoginRequest, TokenResponse
-from api.dependencies import security
+from api.schemas import SignupRequest, LoginRequest, TokenResponse, UserOut
+from api.dependencies import security, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -33,3 +33,8 @@ def login(payload: LoginRequest):
 def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
     delete_remember_token(credentials.credentials)
     return {"detail": "Logged out"}
+
+
+@router.get("/me", response_model=UserOut)
+def get_me(user: dict = Depends(get_current_user)):
+    return user

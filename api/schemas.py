@@ -22,6 +22,7 @@ class UserOut(BaseModel):
     id: int
     email: str
     display_name: str | None = None
+    avatar_s3_key: str | None = None
 
 
 class ProfileData(BaseModel):

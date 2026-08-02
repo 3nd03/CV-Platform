@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
+import { getMe } from './api/auth'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Onboarding from './pages/Onboarding'
@@ -26,6 +28,25 @@ function ProtectedRoute({ children }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    if (!localStorage.getItem('token')) return
+    getMe()
+      .then((user) => {
+        localStorage.setItem('email', user.email)
+        if (user.display_name) {
+          localStorage.setItem('display_name', user.display_name)
+        } else {
+          localStorage.removeItem('display_name')
+        }
+        if (user.avatar_s3_key) {
+          localStorage.setItem('avatar_s3_key', user.avatar_s3_key)
+        } else {
+          localStorage.removeItem('avatar_s3_key')
+        }
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <BrowserRouter>
       <Routes>

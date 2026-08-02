@@ -14,3 +14,8 @@ export async function logout() {
   const { data } = await client.post('/auth/logout')
   return data
 }
+
+export async function getMe() {
+  const { data } = await client.get('/auth/me')
+  return data
+}

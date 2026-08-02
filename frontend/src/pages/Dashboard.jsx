@@ -91,15 +91,9 @@ function MetricCard({ icon: Icon, label, value, subtext, className = '', size = 
       >
         <Icon size={isSm ? 8.75 : 12.5} />
       </div>
-      <p
-        className={`font-bold text-teal ${
-          isSm ? 'text-[10px] leading-[15px] mt-[3.75px]' : 'text-[15px] leading-[20px] mt-[7.5px]'
-        }`}
-      >
-        {value}
-      </p>
-      <p className="text-[7.5px] leading-[10px] text-gray-500 mt-[2.5px]">{label}</p>
-      {subtext && <p className="text-[7.5px] leading-[10px] text-gray-400 mt-[1.25px]">{subtext}</p>}
+      <p className={`font-bold text-teal ${isSm ? 'text-base mt-[3.75px]' : 'text-2xl mt-[7.5px]'}`}>{value}</p>
+      <p className="text-xs text-gray-500 mt-[2.5px]">{label}</p>
+      {subtext && <p className="text-xs text-gray-400 mt-[1.25px]">{subtext}</p>}
     </Card>
   )
 }

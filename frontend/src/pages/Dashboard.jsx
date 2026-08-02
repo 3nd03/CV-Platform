@@ -82,9 +82,9 @@ function Divider() {
   return <div className="border-t border-gray-100 my-8" />
 }
 
-function MetricCard({ icon: Icon, label, value, subtext, className = '' }) {
+function MetricCard({ icon: Icon, label, value, subtext, className = '', highlight = false }) {
   return (
-    <Card className={`!p-5 ${className}`}>
+    <Card className={`!p-5 ${highlight ? '!bg-mint-light !border-mint' : ''} ${className}`}>
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 min-w-0">
           <Icon size={16} className="text-teal shrink-0" />
@@ -92,7 +92,7 @@ function MetricCard({ icon: Icon, label, value, subtext, className = '' }) {
         </div>
         {subtext && <span className="text-xs text-gray-500 shrink-0">{subtext}</span>}
       </div>
-      <p className="text-2xl font-bold text-teal mt-2 text-left truncate">{value}</p>
+      <p className={`font-bold text-teal mt-2 text-left truncate ${highlight ? 'text-3xl' : 'text-2xl'}`}>{value}</p>
     </Card>
   )
 }
@@ -189,6 +189,7 @@ export default function Dashboard() {
         <SectionHeading>Your progress</SectionHeading>
         <div className="mt-4 grid grid-cols-2 gap-4">
           <MetricCard
+            highlight
             className="col-span-2"
             icon={Target}
             label="Target role"

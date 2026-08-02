@@ -82,16 +82,30 @@ function Divider() {
   return <div className="border-t border-gray-100 my-8" />
 }
 
-function MetricCard({ icon: Icon, label, value, subtext, className = '', size = 'lg' }) {
-  const isSm = size === 'sm'
+function TargetRoleCard({ value, hasValue }) {
+  return (
+    <Card className="col-span-2 !p-5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Target size={16} className="text-teal shrink-0" />
+          <span className="font-bold text-teal text-sm">Target role</span>
+        </div>
+        <span className="text-xs text-gray-500 shrink-0">
+          {hasValue ? 'Current focus' : 'Set this in onboarding'}
+        </span>
+      </div>
+      <p className="text-2xl font-bold text-teal mt-2 text-left">{value}</p>
+    </Card>
+  )
+}
+
+function MetricCard({ icon: Icon, label, value, subtext, className = '' }) {
   return (
     <Card className={className}>
-      <div
-        className={`${isSm ? 'w-[17.5px] h-[17.5px]' : 'w-[25px] h-[25px]'} rounded-full bg-mint-light flex items-center justify-center text-teal`}
-      >
-        <Icon size={isSm ? 8.75 : 12.5} />
+      <div className="w-[17.5px] h-[17.5px] rounded-full bg-mint-light flex items-center justify-center text-teal">
+        <Icon size={8.75} />
       </div>
-      <p className={`font-bold text-teal ${isSm ? 'text-base mt-[3.75px]' : 'text-2xl mt-[7.5px]'}`}>{value}</p>
+      <p className="font-bold text-teal text-base mt-[3.75px]">{value}</p>
       <p className="text-xs text-gray-500 mt-[2.5px]">{label}</p>
       {subtext && <p className="text-xs text-gray-400 mt-[1.25px]">{subtext}</p>}
     </Card>
@@ -189,15 +203,8 @@ export default function Dashboard() {
       <section>
         <SectionHeading>Your progress</SectionHeading>
         <div className="mt-4 grid grid-cols-2 gap-4">
+          <TargetRoleCard value={data.target_role || 'Not set'} hasValue={!!data.target_role} />
           <MetricCard
-            className="col-span-2 !p-[15px]"
-            icon={Target}
-            label="Target Role"
-            value={data.target_role || 'Not set'}
-            subtext={data.target_role ? 'Current focus' : 'Set this in onboarding'}
-          />
-          <MetricCard
-            size="sm"
             className="col-span-2 !p-[7.5px]"
             icon={BarChart2}
             label="Skill Gap Score"
@@ -209,7 +216,6 @@ export default function Dashboard() {
             }
           />
           <MetricCard
-            size="sm"
             className="col-span-1 !p-[7.5px]"
             icon={CheckSquare}
             label="Tools Used"
@@ -217,7 +223,6 @@ export default function Dashboard() {
             subtext="All time"
           />
           <MetricCard
-            size="sm"
             className="col-span-1 !p-[7.5px]"
             icon={UserCheck}
             label="Profile Complete"

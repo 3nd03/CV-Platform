@@ -1,17 +1,48 @@
-export default function Logo({ className = '', showText = true }) {
+function TargetMark() {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
-        <circle cx="12" cy="12" r="10" stroke="#1a3a3a" strokeWidth="2" fill="none" />
-        <circle cx="12" cy="12" r="5.5" stroke="#1a3a3a" strokeWidth="1.5" fill="none" />
-        <circle cx="12" cy="12" r="2.5" fill="#abebd9" />
+    <>
+      {/* outer ring, open on the right to form the C */}
+      <path d="M 33 31 A 17 17 0 1 1 33 9" stroke="#1a3a3a" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <circle cx="20" cy="20" r="11" stroke="#1a3a3a" strokeWidth="2.5" fill="none" />
+      <circle cx="20" cy="20" r="6" stroke="#1a3a3a" strokeWidth="2" fill="none" />
+      <circle cx="20" cy="20" r="3" fill="#abebd9" />
+      <line x1="33.4" y1="6.6" x2="20" y2="20" stroke="#1a3a3a" strokeWidth="2" strokeLinecap="round" />
+      <polygon points="20,20 24.6,18.9 21.1,15.4" fill="#1a3a3a" />
+    </>
+  )
+}
+
+export default function Logo({ className = '', showText = true }) {
+  if (!showText) {
+    return (
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 40 40"
+        fill="none"
+        aria-hidden="true"
+        className={`shrink-0 ${className}`}
+      >
+        <TargetMark />
       </svg>
-      {showText && (
-        <span className="text-lg font-bold leading-none">
-          <span style={{ color: '#1a3a3a' }}>Career</span>
-          <span style={{ color: '#abebd9' }}>ly</span>
-        </span>
-      )}
-    </span>
+    )
+  }
+
+  return (
+    <svg
+      width="140"
+      height="40"
+      viewBox="0 0 140 40"
+      fill="none"
+      role="img"
+      aria-label="Careerly"
+      className={`shrink-0 ${className}`}
+    >
+      <TargetMark />
+      <text x="44" y="28" fontFamily="'Nunito', sans-serif" fontWeight="800" fontSize="26">
+        <tspan fill="#1a3a3a">areer</tspan>
+        <tspan fill="#abebd9">ly</tspan>
+      </text>
+    </svg>
   )
 }

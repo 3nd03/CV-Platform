@@ -196,7 +196,8 @@ export default function Dashboard() {
             subtext={data.target_role ? 'Current focus' : 'Set this in onboarding'}
           />
           <MetricCard
-            className="col-span-2 min-h-[80px]"
+            compact
+            className="col-span-2 !p-3 min-h-[80px]"
             icon={BarChart2}
             label="Skill Gap Score"
             value={skillGapScore || 'N/A'}

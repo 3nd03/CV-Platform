@@ -57,3 +57,8 @@ export async function uploadAvatar(file) {
   })
   return data
 }
+
+export async function getToolsUsed() {
+  const { data } = await client.get('/profile/tools-used')
+  return data
+}

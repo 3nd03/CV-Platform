@@ -4,9 +4,9 @@ import { Target, BarChart2, CheckSquare, UserCheck, Sparkles, PartyPopper, Arrow
 import Layout from '../components/Layout'
 import Card from '../components/Card'
 import Logo from '../components/Logo'
-import { getProfile } from '../api/profile'
+import { getProfile, getToolsUsed } from '../api/profile'
 import { TOOLS, TOOL_CATEGORIES } from '../config/tools'
-import { getToolsUsedCount, isToolUsed } from '../utils/toolActivity'
+import { isToolUsed } from '../utils/toolActivity'
 
 const PROFILE_FIELD_KEYS = [
   'target_role',
@@ -101,6 +101,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState(TOOL_CATEGORIES[0])
+  const [toolsUsed, setToolsUsed] = useState({ count: 0, total: 0 })
 
   useEffect(() => {
     getProfile()
@@ -111,6 +112,9 @@ export default function Dashboard() {
         }
       })
       .finally(() => setLoading(false))
+    getToolsUsed()
+      .then(setToolsUsed)
+      .catch(() => {})
   }, [navigate])
 
   useEffect(() => {
@@ -136,7 +140,6 @@ export default function Dashboard() {
   const profileIncomplete = filledCount < PROFILE_FIELD_KEYS.length
 
   const skillGapScore = sessionStorage.getItem('skill_gap_score')
-  const toolsUsed = getToolsUsedCount()
 
   const recommendation = getRecommendation({ profileIncomplete, profilePct, skillGapScore })
   const RecommendationIcon = recommendation.icon
@@ -194,8 +197,8 @@ export default function Dashboard() {
           <MetricCard
             icon={CheckSquare}
             label="Tools Used"
-            value={`${toolsUsed} / ${TOOLS.length}`}
-            subtext="This session"
+            value={`${toolsUsed.count} / ${toolsUsed.total}`}
+            subtext="All time"
           />
           <MetricCard
             icon={UserCheck}

@@ -89,6 +89,11 @@ class AvatarUploadResponse(BaseModel):
     avatar_s3_key: str
 
 
+class ToolsUsedResponse(BaseModel):
+    count: int
+    total: int
+
+
 class CoverLetterRequest(BaseModel):
     job_description: str
 

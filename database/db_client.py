@@ -405,6 +405,35 @@ def _insert(table: str, profile_id: int, column: str, value) -> None:
     conn.close()
 
 
+# The 8 tools counted toward the dashboard's "tools used" metric. Deliberately
+# excludes cv_download_results, cv_translations, and applications, which aren't
+# part of this metric.
+TOOLS_USED_KEYS = [
+    "skill_gap",
+    "cv_analysis",
+    "cover_letter",
+    "job_roles",
+    "linkedin_message",
+    "interview_prep",
+    "career_roadmap",
+    "salary_insights",
+]
+
+
+def get_tools_used_count(profile_id: int) -> int:
+    conn = get_connection()
+    cur = conn.cursor()
+    count = 0
+    for tool_key in TOOLS_USED_KEYS:
+        table = RESULT_TABLES[tool_key]
+        cur.execute(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE profile_id = %s);", (profile_id,))
+        if cur.fetchone()[0]:
+            count += 1
+    cur.close()
+    conn.close()
+    return count
+
+
 def get_latest(tool_key: str, profile_id: int) -> dict | None:
     table = RESULT_TABLES[tool_key]
     conn = get_connection()

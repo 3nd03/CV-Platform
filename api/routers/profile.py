@@ -13,6 +13,8 @@ from database.db_client import (
     update_profile_label,
     update_user,
     get_history,
+    get_tools_used_count,
+    TOOLS_USED_KEYS,
     RESULT_TABLES,
 )
 from services.claude_client import call_claude
@@ -27,6 +29,7 @@ from api.schemas import (
     CVPrefillResponse,
     HistoryEntry,
     AvatarUploadResponse,
+    ToolsUsedResponse,
 )
 from api.dependencies import get_current_user, get_current_profile
 
@@ -136,3 +139,8 @@ async def upload_avatar_endpoint(file: UploadFile = File(...), user: dict = Depe
     key = upload_avatar(file_bytes, user["id"], file.filename)
     update_user(user["id"], avatar_s3_key=key)
     return AvatarUploadResponse(avatar_s3_key=key)
+
+
+@router.get("/tools-used", response_model=ToolsUsedResponse)
+def get_tools_used(profile: dict = Depends(get_current_profile)):
+    return ToolsUsedResponse(count=get_tools_used_count(profile["id"]), total=len(TOOLS_USED_KEYS))

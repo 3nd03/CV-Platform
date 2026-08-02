@@ -219,7 +219,7 @@ export default function Dashboard() {
           <MetricCard
             className="col-span-1"
             icon={UserCheck}
-            label="Profile Complete"
+            label="Profile"
             value={`${profilePct}%`}
             subtext={`${filledCount} of ${PROFILE_FIELD_KEYS.length} fields`}
           />

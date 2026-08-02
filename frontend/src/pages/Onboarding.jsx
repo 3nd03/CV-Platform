@@ -40,6 +40,7 @@ export default function Onboarding() {
   const [prefillNotice, setPrefillNotice] = useState('')
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
+  const [prefilledKeys, setPrefilledKeys] = useState(() => new Set())
   const [current, setCurrent] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -64,6 +65,7 @@ export default function Onboarding() {
       )
       if (Object.keys(filled).length > 0) {
         setAnswers((prev) => ({ ...prev, ...filled }))
+        setPrefilledKeys(new Set(Object.keys(filled)))
         setPrefillNotice("We've pre-filled what we could find from your CV. Check it over and adjust anything that's wrong.")
       }
     } catch {
@@ -164,6 +166,7 @@ export default function Onboarding() {
   }
 
   const progressPct = ((step + 1) / QUESTIONS.length) * 100
+  const isPrefilled = prefilledKeys.has(key)
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-10">
@@ -174,7 +177,14 @@ export default function Onboarding() {
           <p className="text-xs uppercase tracking-wide text-mint font-semibold text-right">
             Question {step + 1} of {QUESTIONS.length}
           </p>
-          <h2 className="text-lg font-bold text-teal mt-2">{question}</h2>
+          <div className="flex items-center gap-2 mt-2">
+            <h2 className="text-lg font-bold text-teal">{question}</h2>
+            {isPrefilled && (
+              <span className="shrink-0 bg-mint-light text-teal text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full border border-mint">
+                Pre-filled
+              </span>
+            )}
+          </div>
 
           {prefillNotice && CV_EXTRACTABLE_KEYS.has(key) && (
             <p className="text-xs text-gray-500 mt-2">{prefillNotice}</p>
@@ -182,14 +192,18 @@ export default function Onboarding() {
 
           {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
 
-          <textarea
-            value={current}
-            onChange={(e) => setCurrent(e.target.value)}
-            onKeyDown={handleTextareaKeyDown}
-            rows={5}
-            className="mt-4 w-full bg-gray-50 border border-mint-border rounded-lg px-4 py-3 text-body focus:outline-none focus:border-mint"
-            disabled={submitting}
-          />
+          <div className={isPrefilled ? 'mt-4 border-l-[3px] border-mint rounded-r-lg overflow-hidden' : 'mt-4'}>
+            <textarea
+              value={current}
+              onChange={(e) => setCurrent(e.target.value)}
+              onKeyDown={handleTextareaKeyDown}
+              rows={5}
+              className={`w-full bg-gray-50 border border-mint-border px-4 py-3 text-body focus:outline-none focus:border-mint ${
+                isPrefilled ? 'rounded-r-lg' : 'rounded-lg'
+              }`}
+              disabled={submitting}
+            />
+          </div>
           <p className="text-xs text-gray-500 mt-1">Press Enter to continue, Shift+Enter for a new line.</p>
 
           <div className="mt-4 flex gap-3">

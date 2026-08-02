@@ -105,16 +105,23 @@ def rename_profile(profile_id: int, payload: ProfileLabelUpdate, user: dict = De
     return {"detail": "Label updated"}
 
 
+def _format_history_entries(entries: list[dict]) -> list[dict]:
+    return [
+        {
+            "content": entry.get("result") or entry.get("letter_text") or entry.get("message_text") or "",
+            "created_at": entry["created_at"],
+        }
+        for entry in entries
+    ]
+
+
 @router.get("/history", response_model=dict[str, list[HistoryEntry]])
 def get_profile_history(profile: dict = Depends(get_current_profile)):
-    history = {}
-    for tool_key in RESULT_TABLES:
-        entries = get_history(tool_key, profile["id"])
-        history[tool_key] = [
-            {
-                "content": entry.get("result") or entry.get("letter_text") or entry.get("message_text") or "",
-                "created_at": entry["created_at"],
-            }
-            for entry in entries
-        ]
-    return history
+    return {tool_key: _format_history_entries(get_history(tool_key, profile["id"])) for tool_key in RESULT_TABLES}
+
+
+@router.get("/history/{tool_key}", response_model=list[HistoryEntry])
+def get_profile_history_for_tool(tool_key: str, profile: dict = Depends(get_current_profile)):
+    if tool_key not in RESULT_TABLES:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown tool")
+    return _format_history_entries(get_history(tool_key, profile["id"]))

@@ -43,3 +43,8 @@ export async function getProfileHistory() {
   const { data } = await client.get('/profile/history')
   return data
 }
+
+export async function getToolHistory(toolKey) {
+  const { data } = await client.get(`/profile/history/${toolKey}`)
+  return data
+}

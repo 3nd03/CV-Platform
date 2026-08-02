@@ -162,19 +162,21 @@ export default function Dashboard() {
 
       <section>
         <SectionHeading>Recommended next step</SectionHeading>
-        <div className="mt-4 bg-mint-light border border-mint rounded-2xl p-5 flex items-center gap-4">
-          <span className="w-11 h-11 shrink-0 rounded-full bg-mint flex items-center justify-center text-teal">
-            <RecommendationIcon size={20} />
-          </span>
-          <div className="flex-1">
-            <p className="font-bold text-teal text-sm">{recommendation.title}</p>
-            <p className="text-body text-sm mt-0.5">{recommendation.body}</p>
+        <div className="mt-4 bg-mint-light border border-mint rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            <span className="w-11 h-11 shrink-0 rounded-full bg-mint flex items-center justify-center text-teal">
+              <RecommendationIcon size={20} />
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-teal text-sm">{recommendation.title}</p>
+              <p className="text-body text-sm mt-0.5">{recommendation.body}</p>
+            </div>
           </div>
           {recommendation.cta && (
             <button
               type="button"
               onClick={() => navigate(recommendation.to)}
-              className="shrink-0 flex items-center gap-1 bg-mint text-teal rounded-[10px] px-4 h-10 text-sm font-medium hover:brightness-90 transition-all duration-200"
+              className="shrink-0 w-full sm:w-auto flex items-center justify-center gap-1 bg-mint text-teal rounded-[10px] px-4 h-10 text-sm font-medium hover:brightness-90 transition-all duration-200"
             >
               {recommendation.cta}
               <ArrowRight size={14} />

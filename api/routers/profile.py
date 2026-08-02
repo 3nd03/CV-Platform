@@ -13,6 +13,7 @@ from database.db_client import (
     update_profile_label,
     update_user,
     get_history,
+    get_latest,
     get_tools_used_count,
     TOOLS_USED_KEYS,
     RESULT_TABLES,
@@ -30,6 +31,7 @@ from api.schemas import (
     HistoryEntry,
     AvatarUploadResponse,
     ToolsUsedResponse,
+    LatestSkillGapResponse,
 )
 from api.dependencies import get_current_user, get_current_profile
 
@@ -144,3 +146,11 @@ async def upload_avatar_endpoint(file: UploadFile = File(...), user: dict = Depe
 @router.get("/tools-used", response_model=ToolsUsedResponse)
 def get_tools_used(profile: dict = Depends(get_current_profile)):
     return ToolsUsedResponse(count=get_tools_used_count(profile["id"]), total=len(TOOLS_USED_KEYS))
+
+
+@router.get("/latest-skill-gap", response_model=LatestSkillGapResponse)
+def get_latest_skill_gap(profile: dict = Depends(get_current_profile)):
+    latest = get_latest("skill_gap", profile["id"])
+    if not latest:
+        return LatestSkillGapResponse()
+    return LatestSkillGapResponse(result=latest["result"], created_at=latest["created_at"])

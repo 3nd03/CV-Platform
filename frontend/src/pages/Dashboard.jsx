@@ -4,7 +4,7 @@ import { Target, BarChart2, CheckSquare, UserCheck, Sparkles, PartyPopper, Arrow
 import Layout from '../components/Layout'
 import Card from '../components/Card'
 import Logo from '../components/Logo'
-import { getProfile, getToolsUsed } from '../api/profile'
+import { getProfile, getToolsUsed, getLatestSkillGap } from '../api/profile'
 import { TOOLS, TOOL_CATEGORIES } from '../config/tools'
 import { isToolUsed } from '../utils/toolActivity'
 
@@ -102,6 +102,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState(TOOL_CATEGORIES[0])
   const [toolsUsed, setToolsUsed] = useState({ count: 0, total: 0 })
+  const [skillGap, setSkillGap] = useState(null)
 
   useEffect(() => {
     getProfile()
@@ -114,6 +115,9 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
     getToolsUsed()
       .then(setToolsUsed)
+      .catch(() => {})
+    getLatestSkillGap()
+      .then(setSkillGap)
       .catch(() => {})
   }, [navigate])
 
@@ -139,7 +143,7 @@ export default function Dashboard() {
   const profilePct = Math.round((filledCount / PROFILE_FIELD_KEYS.length) * 100)
   const profileIncomplete = filledCount < PROFILE_FIELD_KEYS.length
 
-  const skillGapScore = sessionStorage.getItem('skill_gap_score')
+  const skillGapScore = skillGap?.result?.MATCH_SCORE || null
 
   const recommendation = getRecommendation({ profileIncomplete, profilePct, skillGapScore })
   const RecommendationIcon = recommendation.icon
@@ -186,7 +190,11 @@ export default function Dashboard() {
             icon={BarChart2}
             label="Skill Gap Score"
             value={skillGapScore || 'N/A'}
-            subtext={skillGapScore ? 'From your last analysis' : 'Not run yet'}
+            subtext={
+              skillGapScore && skillGap?.created_at
+                ? `As of ${new Date(skillGap.created_at).toLocaleDateString()}`
+                : 'Not run yet'
+            }
           />
           <MetricCard
             icon={Target}

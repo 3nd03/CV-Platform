@@ -62,3 +62,8 @@ export async function getToolsUsed() {
   const { data } = await client.get('/profile/tools-used')
   return data
 }
+
+export async function getLatestSkillGap() {
+  const { data } = await client.get('/profile/latest-skill-gap')
+  return data
+}

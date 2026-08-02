@@ -94,6 +94,11 @@ class ToolsUsedResponse(BaseModel):
     total: int
 
 
+class LatestSkillGapResponse(BaseModel):
+    result: dict | None = None
+    created_at: datetime | None = None
+
+
 class CoverLetterRequest(BaseModel):
     job_description: str
 

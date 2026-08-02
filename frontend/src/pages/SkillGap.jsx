@@ -28,8 +28,6 @@ export default function SkillGap() {
       const data = await runSkillGap()
       setResult(data)
       markToolUsed('skill_gap')
-      const match = /\d+/.exec(data.MATCH_SCORE || '')
-      if (match) sessionStorage.setItem('skill_gap_score', `${match[0]}%`)
     } catch {
       setError('Could not run the analysis. Try again.')
     } finally {

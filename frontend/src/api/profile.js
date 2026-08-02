@@ -48,3 +48,12 @@ export async function getToolHistory(toolKey) {
   const { data } = await client.get(`/profile/history/${toolKey}`)
   return data
 }
+
+export async function uploadAvatar(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await client.post('/profile/avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}

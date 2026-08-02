@@ -85,6 +85,10 @@ class HistoryEntry(BaseModel):
     created_at: datetime
 
 
+class AvatarUploadResponse(BaseModel):
+    avatar_s3_key: str
+
+
 class CoverLetterRequest(BaseModel):
     job_description: str
 

@@ -11,10 +11,12 @@ from database.db_client import (
     set_active_profile,
     update_profile,
     update_profile_label,
+    update_user,
     get_history,
     RESULT_TABLES,
 )
 from services.claude_client import call_claude
+from services.s3_client import upload_avatar
 from utils.pdf import extract_pdf_text
 from prompts.profile_extraction_prompt import build_profile_extraction_prompt
 from api.schemas import (
@@ -24,6 +26,7 @@ from api.schemas import (
     ProfileLabelUpdate,
     CVPrefillResponse,
     HistoryEntry,
+    AvatarUploadResponse,
 )
 from api.dependencies import get_current_user, get_current_profile
 
@@ -125,3 +128,11 @@ def get_profile_history_for_tool(tool_key: str, profile: dict = Depends(get_curr
     if tool_key not in RESULT_TABLES:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown tool")
     return _format_history_entries(get_history(tool_key, profile["id"]))
+
+
+@router.post("/avatar", response_model=AvatarUploadResponse)
+async def upload_avatar_endpoint(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    file_bytes = await file.read()
+    key = upload_avatar(file_bytes, user["id"], file.filename)
+    update_user(user["id"], avatar_s3_key=key)
+    return AvatarUploadResponse(avatar_s3_key=key)

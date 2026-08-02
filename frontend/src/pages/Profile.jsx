@@ -10,6 +10,7 @@ import {
   activateProfile,
   renameProfile,
   getProfileHistory,
+  uploadAvatar,
 } from '../api/profile'
 
 const HISTORY_LABELS = {
@@ -93,6 +94,8 @@ export default function Profile() {
   const location = useLocation()
   const fileInputRef = useRef(null)
   const [avatarPreview, setAvatarPreview] = useState(null)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarError, setAvatarError] = useState('')
 
   const email = localStorage.getItem('email') || ''
   const displayName = localStorage.getItem('display_name') || email.split('@')[0] || 'Account'
@@ -179,11 +182,21 @@ export default function Profile() {
       .catch(() => {})
   }
 
-  function handleAvatarPick(e) {
+  async function handleAvatarPick(e) {
     const file = e.target.files?.[0]
     if (!file) return
-    if (avatarPreview) URL.revokeObjectURL(avatarPreview)
-    setAvatarPreview(URL.createObjectURL(file))
+    setAvatarError('')
+    setAvatarUploading(true)
+    try {
+      const { avatar_s3_key } = await uploadAvatar(file)
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview)
+      setAvatarPreview(URL.createObjectURL(file))
+      localStorage.setItem('avatar_s3_key', avatar_s3_key)
+    } catch {
+      setAvatarError('Could not upload avatar. Try again.')
+    } finally {
+      setAvatarUploading(false)
+    }
   }
 
   async function handleSaveProfile(e) {
@@ -225,7 +238,8 @@ export default function Profile() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-24 h-24 shrink-0 rounded-full border-2 border-mint bg-mint-light flex items-center justify-center text-teal font-bold text-2xl overflow-hidden"
+              disabled={avatarUploading}
+              className="w-24 h-24 shrink-0 rounded-full border-2 border-mint bg-mint-light flex items-center justify-center text-teal font-bold text-2xl overflow-hidden disabled:opacity-50"
             >
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
@@ -237,11 +251,14 @@ export default function Profile() {
             <div>
               <p className="font-medium text-teal">{displayName}</p>
               <p className="text-sm text-gray-500">{email}</p>
-              <p className="text-xs text-gray-500 mt-1">Click the avatar to preview a new photo.</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {avatarUploading ? 'Uploading...' : 'Click the avatar to upload a new photo.'}
+              </p>
+              {avatarError && <p className="text-xs text-red-600 mt-1">{avatarError}</p>}
             </div>
           </div>
           <div className="mt-4">
-            <PlaceholderNote message="Saving name, avatar, and password needs a backend endpoint that isn't available yet." />
+            <PlaceholderNote message="Saving name and password needs a backend endpoint that isn't available yet." />
           </div>
         </section>
 

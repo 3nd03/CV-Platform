@@ -205,14 +205,14 @@ export default function Dashboard() {
             }
           />
           <MetricCard
-            className="col-span-1"
+            className="col-span-1 min-h-[40px]"
             icon={CheckSquare}
             label="Tools Used"
             value={`${toolsUsed.count} / ${toolsUsed.total}`}
             subtext="All time"
           />
           <MetricCard
-            className="col-span-1"
+            className="col-span-1 min-h-[40px]"
             icon={UserCheck}
             label="Profile Complete"
             value={`${profilePct}%`}

@@ -50,11 +50,38 @@ streamlit run app/main.py
 
 ## Running the API
 
-A FastAPI backend exposing the same tools over HTTP lives in `api/`, for use by a separate frontend.
+A FastAPI backend exposing the same tools over HTTP lives in `api/`, used by the React frontend below.
 
 ```bash
 uvicorn api.main:app --reload
 ```
+
+## Running the frontend
+
+A React frontend (Vite + Tailwind) lives in `frontend/` and talks to the FastAPI backend above.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Opens at `http://localhost:3000`.
+
+### Testing on a phone (same WiFi)
+
+Both servers need to be reachable on the LAN, not just `localhost`:
+
+```bash
+uvicorn api.main:app --reload --host 0.0.0.0
+```
+
+```bash
+cd frontend
+npm run dev -- --host
+```
+
+Find this machine's LAN IP (`ipconfig` on Windows, look for IPv4 Address) and open `http://<LAN-IP>:3000` on the phone. The frontend's API base URL already follows whatever host it was loaded from, so this works without extra config.
 
 ## Project structure
 
@@ -92,6 +119,15 @@ prompts/
 utils/
   helpers.py           Shared profile rendering and navigation helpers
   pdf.py               PDF text extraction, shared by CV Analyser and onboarding prefill
+
+api/
+  main.py              FastAPI app
+  routers/             One router per feature area (profile, tools, auth, ...)
+
+frontend/
+  src/pages/           One page per route (dashboard, profile, each tool)
+  src/components/      Shared UI (Layout, Card, BottomNav, Logo, ...)
+  src/api/             Axios client and API calls
 ```
 
 ## Architecture
